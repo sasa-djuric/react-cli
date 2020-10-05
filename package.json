@@ -1,0 +1,23 @@
+{
+  "name": "react-cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/djsasa/react-cli.git"
+  },
+  "keywords": [
+    "react",
+    "cli"
+  ],
+  "author": "Saša Đurić",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/djsasa/react-cli/issues"
+  },
+  "homepage": "https://github.com/djsasa/react-cli#readme"
+}
