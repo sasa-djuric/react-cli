@@ -1,0 +1,21 @@
+{
+    "project": {
+        "type": "cra",
+        "typescript": true
+    },
+    "component": {
+        "withStyle": true,
+        "withStroy": false,
+        "withTest": false,
+        "withProptypes": false,
+        "withIndex": true,
+        "inFloder": true,
+        "casing": "kebab",
+        "naming": "name",
+        "path": "src/components"
+    },
+    "style": {
+        "type": "scss",
+        "modules": false
+    }
+}
