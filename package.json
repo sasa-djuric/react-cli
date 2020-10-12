@@ -4,8 +4,9 @@
 	"description": "",
 	"main": "lib/index.js",
 	"bin": {
-		"@sasa_djuric/react": "lib/index.js",
-		"react": "lib/index.js"
+		"@sasa_djuric/react-cli": "lib/index.js",
+		"react": "lib/index.js",
+		"react-cli": "lib/index.js"
 	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"

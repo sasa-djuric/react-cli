@@ -1,16 +1,20 @@
 import fs from 'fs';
 import path from 'path';
 import casing from 'case';
+import { exec } from 'child_process';
+
+// Types
+import { Options, Constraints } from '../types/index';
 
 // Utils
-import { makeIndexFileExport } from '../utils';
+import { featureToggle, getProjectRoot, makeIndexFileExport } from '../utils';
 
 // Services
-import templateService from '../services/template';
-
-// Constants
-import { config } from '../constants';
 import styleService from '../services/style';
+import testService from '../services/test';
+import componentService from '../services/component';
+import storyService from '../services/story';
+import configService from '../services/config';
 
 function checkSubFolders(mainPath: string, subFolders: string[]) {
 	let lastPath = mainPath;
@@ -24,45 +28,56 @@ function checkSubFolders(mainPath: string, subFolders: string[]) {
 	}
 }
 
-function create(name: string, options: { [key: string]: boolean }) {
+function create(name: string, options: Options, constraints: Constraints) {
+	const config = configService.get();
 	const componentName = name.lastIndexOf('/') >= 0 ? name.substr(name.lastIndexOf('/') + 1) : name;
 	const namePascal = casing.pascal(componentName);
 	const namePreferred = casing[config.component.casing](componentName);
 	const subFolders = name.split('/').slice(0, name.split('/').length - 1);
 	const componentPath = path.resolve(
-		config.component.path,
+		getProjectRoot(),
+		options.path || config.component.path,
 		...subFolders,
 		config.component.inFolder ? namePreferred : ''
 	);
-	const template = templateService.component.create(componentName, options);
+	const fileExtension = config.project.typescript ? '.tsx' : '.jsx';
+	const filePath = path.resolve(componentPath, name + fileExtension);
+	const feature = featureToggle('component', config, options, constraints);
 
 	try {
-		checkSubFolders(config.component.path, subFolders);
+		checkSubFolders(path.resolve(getProjectRoot(), config.component.path), subFolders);
+
+		feature('inFolder', () => {
+			fs.mkdirSync(componentPath);
+		});
+
+		componentService.create(namePreferred, componentPath, options, constraints, config);
+
+		feature('style', () => {
+			styleService.create(namePreferred, config.style, componentPath);
+		});
+		feature('index', () => {
+			makeIndexFileExport(
+				componentPath,
+				namePascal,
+				namePreferred,
+				config.project.typescript ? 'ts' : 'js'
+			);
+		});
+		feature('test', () => {
+			testService.create(namePreferred, componentPath, {
+				...config.testing,
+				typescript: config.project.typescript,
+			});
+		});
+		feature('story', () => {
+			storyService.create(namePreferred, { typescript: config.project.typescript }, componentPath);
+		});
+		feature('open', () => {
+			exec(filePath);
+		});
 	} catch (err) {
-		return;
-	}
-
-	if (config.component.inFolder) {
-		fs.mkdirSync(path.resolve(config.component.path, ...subFolders, namePreferred));
-	}
-
-	fs.writeFileSync(
-		path.resolve(componentPath, namePreferred + (config.project.typescript ? '.tsx' : '.jsx')),
-		template,
-		{ encoding: 'utf-8' }
-	);
-
-	if (config.component.withStyle) {
-		styleService.create(namePreferred, config.style, componentPath);
-	}
-
-	if (config.component.withIndex) {
-		makeIndexFileExport(
-			componentPath,
-			namePascal,
-			namePreferred,
-			config.project.typescript ? 'ts' : 'js'
-		);
+		console.log(err);
 	}
 }
 

@@ -1,35 +1,16 @@
 // Libs
 import inquirer from 'inquirer';
-import path from 'path';
+
+// Constants
 import { projectTypes, styleTypes } from '../constants';
-import { Config } from '../types/config';
 
-// Utils
-import { parseOptions, saveFile } from '../utils';
+// Services
+import configService from '../services/config';
 
-const defaultConfig: Config = {
-	project: {
-		type: 'cra',
-		typescript: false,
-	},
-	component: {
-		path: 'src/components',
-		withStyle: true,
-		withStroy: false,
-		withTest: false,
-		withProptypes: false,
-		withIndex: true,
-		inFolder: true,
-		casing: 'snake',
-		naming: 'name',
-	},
-	style: {
-		type: 'scss',
-		modules: true,
-	},
-};
+// Types
+import { scope } from '../types';
 
-function project() {
+function project(scope: scope) {
 	return inquirer
 		.prompt([
 			{
@@ -38,7 +19,12 @@ function project() {
 				message: 'Project type',
 				choices: projectTypes.map(type => type.label),
 			},
-			{ type: 'confirm', name: 'typescript', message: 'Using typescript' },
+			{
+				type: 'confirm',
+				name: 'typescript',
+				message: 'Using typescript?',
+				when: () => scope === 'global',
+			},
 		])
 		.then(result => {
 			result.type = projectTypes.find(type => type.label === result.type)?.name;
@@ -46,19 +32,24 @@ function project() {
 		});
 }
 
-function component() {
+function component(scope: scope) {
 	return inquirer
 		.prompt([
-			{ type: 'confirm', name: 'defaultPath', message: 'Component path src/components' },
+			{ type: 'confirm', name: 'defaultPath', message: 'Component path src/components ?' },
 			{ type: 'input', name: 'path', message: 'Component path', when: answers => !answers.defaultPath },
-			{ type: 'confirm', name: 'withStyle', message: 'Create style file' },
-			{ type: 'confirm', name: 'withStroy', message: 'Create story file' },
-			{ type: 'confirm', name: 'withTest', message: 'Create test file' },
-			{ type: 'confirm', name: 'withProptypes', message: 'Use proptypes' },
-			{ type: 'confirm', name: 'withIndex', message: 'Create index export file' },
-			{ type: 'confirm', name: 'inFloder', message: 'Create folder for component' },
+			{ type: 'confirm', name: 'style', message: 'Create style file?' },
+			{ type: 'confirm', name: 'story', message: 'Create story file?' },
+			{ type: 'confirm', name: 'test', message: 'Create test file?' },
+			{ type: 'confirm', name: 'proptypes', message: 'Use proptypes?' },
+			{ type: 'confirm', name: 'index', message: 'Create index export file?' },
+			{ type: 'confirm', name: 'inFolder', message: 'Create folder for component?' },
 			{ type: 'list', name: 'casing', choices: ['kebab', 'snake', 'camel', 'pascal'] },
 			{ type: 'list', name: 'naming', choices: ['name', 'index'] },
+			{
+				type: 'confirm',
+				name: 'open',
+				message: 'Open component file in default editor after creating?',
+			},
 		])
 		.then((results: any) => {
 			if (results.defaultPath) {
@@ -70,7 +61,7 @@ function component() {
 		});
 }
 
-function style() {
+function style(scope: scope) {
 	return inquirer.prompt([
 		{
 			type: 'list',
@@ -82,38 +73,35 @@ function style() {
 	]);
 }
 
-async function Init(args: []) {
-	const config: { [key: string]: any } = {};
-	const options = parseOptions(args);
+async function Init() {
+	try {
+		const config: { [key: string]: any } = {};
+		const parts = [
+			{ name: 'project', prompt: project },
+			{ name: 'component', prompt: component },
+			{ name: 'style', prompt: style },
+		];
+		const { scope } = await inquirer.prompt([
+			{
+				type: 'list',
+				name: 'scope',
+				message: 'For what scope you want to make configuration?',
+				choices: ['global', 'project'],
+			},
+		]);
 
-	const parts = [
-		{ name: 'project', prompt: project },
-		{ name: 'component', prompt: component },
-		{ name: 'style', prompt: style },
-	];
+		for (const part of parts) {
+			config[part.name] = await part.prompt(scope);
+		}
 
-	for (const part of parts) {
-		await part
-			.prompt()
-			.then((answers: { [key: string]: any }) => {
-				config[part.name] = answers;
-			})
-			.catch((error: any) => {
-				if (error.isTtyError) {
-					// Prompt couldn't be rendered in the current environment
-					console.log('err');
-				} else {
-					// Something else when wrong
-					console.log('error');
-				}
-
-				process.exit();
-			});
+		configService.create(config, scope);
+	} catch (error) {
+		if (error.isTtyError) {
+			console.log("Couldn't be rendered in the current environment");
+		} else {
+			console.log(error);
+		}
 	}
-
-	console.log(config);
-
-	saveFile(path.resolve(__dirname, 'react-config.json'), config);
 }
 
 export default Init;

@@ -1,15 +1,15 @@
 {
     "project": {
         "type": "cra",
-        "typescript": true
+        "typescript": false
     },
     "component": {
         "withStyle": true,
         "withStroy": false,
         "withTest": false,
         "withProptypes": false,
-        "withIndex": true,
-        "inFloder": true,
+        "withIndex": false,
+        "inFolder": true,
         "casing": "kebab",
         "naming": "name",
         "path": "src/components"

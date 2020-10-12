@@ -1,8 +1,6 @@
-import { styleType } from '../types/config';
 declare function create(name: string, config: {
-    modules: boolean;
-    type: styleType;
-}, filePath: string): void;
+    typescript: boolean;
+}, componentPath: string): void;
 declare const _default: {
     create: typeof create;
 };

@@ -1,2 +1,2 @@
-declare function Init(args: []): Promise<void>;
+declare function Init(): Promise<void>;
 export default Init;

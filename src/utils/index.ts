@@ -1,32 +1,28 @@
 import fs from 'fs';
 import path from 'path';
-import { Config } from '../types/config';
 
 export function parseOptions(args: any) {
 	return Object.values(args.options).reduce((acc: any, optionConfig: any) => {
 		const option: string = optionConfig.long.replace('--', '');
-		return args[option] ? { ...acc, [option]: true } : acc;
+
+		if (option.startsWith('no-')) {
+			return acc;
+		}
+
+		return args[option] ? { ...acc, [option]: args[option] } : acc;
 	}, {});
 }
 
-export function haveOption(option: never, options: []) {
-	return options.indexOf(option) >= 0;
-}
+export function parseConstraints(args: any) {
+	return Object.values(args.parent.args).reduce((acc: any, arg: any) => {
+		const option: string = arg.replace('--', '');
 
-export function saveFile(path: string, content: string | object) {
-	let finalContent: string;
+		if (!option.startsWith('no-')) {
+			return acc;
+		}
 
-	if (typeof content === 'object') {
-		finalContent = JSON.stringify(content, null, 4);
-	} else {
-		finalContent = content;
-	}
-
-	fs.writeFileSync(path, finalContent, { encoding: 'utf8' });
-}
-
-export function getConfig(): Config {
-	return JSON.parse(fs.readFileSync(path.resolve(__dirname, 'react-config.json'), { encoding: 'utf8' }));
+		return { ...acc, [option.replace('no-', '')]: true };
+	}, {});
 }
 
 export function makeIndexFileExport(
@@ -36,6 +32,51 @@ export function makeIndexFileExport(
 	extension: string = 'js'
 ) {
 	const template = `import ${importName} from './${fileName}';\n\nexport default ${importName};`;
-
 	fs.writeFileSync(path.resolve(filePath, `index.${extension}`), template, { encoding: 'utf-8' });
+}
+
+export function conditionalString(condition: any, result?: string) {
+	return condition ? (result ? result : condition) : '';
+}
+
+export function getProjectRoot() {
+	const currentPath = process.cwd();
+	const directories = currentPath.split(path.sep);
+
+	for (let i = 0; i < directories.length; i++) {
+		const currentPath = directories.join(path.sep);
+
+		if (fs.existsSync(path.resolve(currentPath, 'package.json'))) {
+			return currentPath;
+		}
+
+		directories.pop();
+	}
+
+	throw new Error('Project not found');
+}
+
+export function dependencyExists(dependency: string) {
+	try {
+		const packageFile = path.resolve(getProjectRoot(), 'package.json');
+		const packageJson = JSON.parse(fs.readFileSync(packageFile, { encoding: 'utf-8' }));
+		const dependencies = { ...packageJson.dependencies, ...packageJson.devDependencies };
+
+		return !!Object.keys(dependencies).find(dep => dep.includes(dependency));
+	} catch (err) {
+		return;
+	}
+}
+
+export function featureToggle(
+	scope: 'project' | 'component' | 'style',
+	config: any,
+	options: any,
+	constraints: any
+) {
+	return (name: string, fn: Function) => {
+		if ((options[name] || config[scope][name]) && !constraints[name]) {
+			fn();
+		}
+	};
 }
