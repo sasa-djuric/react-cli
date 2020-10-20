@@ -1,0 +1,22 @@
+{
+	"project": {
+		"type": "cra",
+		"typescript": false
+	},
+	"component": {
+		"style": true,
+		"story": false,
+		"test": false,
+		"proptypes": false,
+		"index": false,
+		"inFolder": true,
+		"casing": "kebab",
+		"naming": "name",
+		"open": true,
+		"path": "src/components"
+	},
+	"style": {
+		"type": "scss",
+		"modules": false
+	}
+}

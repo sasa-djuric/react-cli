@@ -16,7 +16,7 @@ import componentService from '../services/component';
 import storyService from '../services/story';
 import configService from '../services/config';
 
-function checkSubFolders(mainPath: string, subFolders: string[]) {
+function _checkSubFolders(mainPath: string, subFolders: string[]) {
 	let lastPath = mainPath;
 
 	for (const folder of subFolders) {
@@ -45,7 +45,7 @@ function create(name: string, options: Options, constraints: Constraints) {
 	const feature = featureToggle('component', config, options, constraints);
 
 	try {
-		checkSubFolders(path.resolve(getProjectRoot(), config.component.path), subFolders);
+		_checkSubFolders(path.resolve(getProjectRoot(), config.component.path), subFolders);
 
 		feature('inFolder', () => {
 			fs.mkdirSync(componentPath);
@@ -56,6 +56,7 @@ function create(name: string, options: Options, constraints: Constraints) {
 		feature('style', () => {
 			styleService.create(namePreferred, config.style, componentPath);
 		});
+
 		feature('index', () => {
 			makeIndexFileExport(
 				componentPath,
@@ -64,15 +65,18 @@ function create(name: string, options: Options, constraints: Constraints) {
 				config.project.typescript ? 'ts' : 'js'
 			);
 		});
+
 		feature('test', () => {
 			testService.create(namePreferred, componentPath, {
 				...config.testing,
 				typescript: config.project.typescript,
 			});
 		});
+
 		feature('story', () => {
 			storyService.create(namePreferred, { typescript: config.project.typescript }, componentPath);
 		});
+
 		feature('open', () => {
 			exec(filePath);
 		});

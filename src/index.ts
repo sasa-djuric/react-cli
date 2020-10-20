@@ -16,6 +16,7 @@ import { parseConstraints, parseOptions } from './utils';
 		.alias('cr')
 		.description('')
 		.option('-s, --style')
+		.option('-t, --typescript')
 		.option('-r, --redux')
 		.option('-p, --proptypes')
 		.option('-t, --test')

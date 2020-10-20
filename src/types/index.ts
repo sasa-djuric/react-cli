@@ -1,6 +1,7 @@
 export type scope = 'global' | 'project';
 
 export interface Options {
+	typescript?: boolean;
 	redux?: boolean;
 	style?: boolean;
 	test?: boolean;

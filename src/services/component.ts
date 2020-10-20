@@ -8,102 +8,139 @@ import fs from 'fs';
 import path from 'path';
 
 // Utils
-import { exportStatement, importStatement, insertBeforeSpace, wrapExport } from '../utils/template';
 import { conditionalString, featureToggle } from '../utils';
+import JSTemplateBuilder from '../builders/js-template-builder';
 
-function includeRedux(template: string, isClass = false) {
-	let draft = '';
-	const templates = {
-		map: `const mapStateToProps = state => {\n    return {\n    \n    };\n};\n\nconst mapDispatchToProps = dispatch => {\n    return {\n    \n    };\n};\n\n`,
-		wrap: `connect(mapStateToProps, mapDispatchToProps)`,
-	};
-
+function _includeRedux(template: JSTemplateBuilder, isClass = false) {
 	if (!isClass) {
-		draft = insertBeforeSpace(draft, templates.map, false);
+		template.generateFunction({
+			name: 'mapStateToProps',
+			args: ['state'],
+			arrow: true,
+			immidiateReturn: true,
+			content: '{\n{{{indent}}}{{{indent}}}\n{{{indent}}}};',
+			insertOptions: {
+				newLine: { beforeCount: 1 },
+				insertBefore: 'export',
+			},
+		});
+
+		template.generateFunction({
+			name: 'mapDispatchToProps',
+			args: ['dispatch'],
+			arrow: true,
+			immidiateReturn: true,
+			content: '{\n{{{indent}}}{{{indent}}}\n{{{indent}}}};',
+			insertOptions: {
+				newLine: { beforeCount: 1 },
+				insertBefore: 'export',
+			},
+		});
 	}
 
-	draft = importStatement(template, '{ connect }', 'react-redux');
-	draft = wrapExport(draft, templates.wrap);
-
-	return draft;
+	template.insertImportStatement('{ connect }', 'react-redux');
+	template.wrapExport(`connect(mapStateToProps, mapDispatchToProps)`);
 }
 
-function includeStyle(template: string, name: string, config: StyleConfig) {
-	let draft = template;
-
+function _includeStyle(template: JSTemplateBuilder, name: string, config: StyleConfig) {
 	if (config.type !== 'styled-components') {
-		draft = importStatement(
-			draft,
-			conditionalString(config.modules, 'styles'),
-			`./${name}${conditionalString(config.modules, '.module')}.${config.type}`
-		);
+		const importName = conditionalString(config.modules, 'styles');
+		const importPath = `./${name}${conditionalString(config.modules, '.module')}.${config.type}`;
+
+		template.insertImportStatement(importName, importPath);
 	} else {
-		draft = importStatement(draft, 'styled', 'styled-components');
+		template.insertImportStatement('styled', 'styled-components');
 	}
 
 	if (config.modules && config.type !== 'styled-components') {
 		const classStr = '<div className=';
-		const classIndex = draft.indexOf(classStr) + classStr.length + 1;
-		const classEndIndex = classIndex + draft.substr(classIndex + 2).indexOf('"') + 2;
-		const className = draft.substr(classIndex, classEndIndex - classIndex);
+		const classIndex = template.toString().indexOf(classStr) + classStr.length + 1;
+		const classEndIndex =
+			classIndex +
+			template
+				.toString()
+				.substr(classIndex + 2)
+				.indexOf('"') +
+			2;
+		const className = template.toString().substr(classIndex, classEndIndex - classIndex);
 
-		draft = draft.substr(0, classIndex - 1) + `{styles.${className}}` + draft.substr(classEndIndex + 1);
+		template.override(
+			template.toString().substr(0, classIndex - 1) +
+				`{styles.${className}}` +
+				template.toString().substr(classEndIndex + 1)
+		);
 	}
-
-	return draft;
 }
 
-function includeProptypes(template: string, name: string) {
-	let draft = template;
+function _includeProptypes(template: JSTemplateBuilder, name: string) {
+	const draft = `${casing.pascal(name)}.propTypes = {\n    \n};\n`;
 
-	draft = importStatement(draft, 'PropTypes', 'prop-types');
-	draft = insertBeforeSpace(draft, `${casing.pascal(name)}.propTypes = {\n    \n};\n\n`, false);
-
-	return draft;
+	template.insertImportStatement('PropTypes', 'prop-types');
+	template.insert(draft, { newLine: { beforeCount: 1 }, insertBefore: 'export' });
 }
 
-function generateTemplate(name: string, options: Options, constraints: Constraints, config: Config) {
-	let template = importStatement('', 'React', 'react');
+function _generateTemplate(name: string, options: Options, constraints: Constraints, config: Config) {
 	const feature = featureToggle('component', config, options, constraints);
+	const template = new JSTemplateBuilder({ indent: 4 });
+	const div = new JSTemplateBuilder({ indent: 4 });
+
+	template.insertImportStatement('React', 'react');
+	div.generateDOMElement({ tag: 'div', props: { className: casing.kebab(name) } });
 
 	if (!options.class) {
-		template =
-			template +
-			`\nconst ${casing.pascal(name)}${conditionalString(
-				config.project.typescript,
-				`: React.SFC<Props>`
-			)} = () => {\n	return <div className="${casing.kebab(name)}"></div>;\n};`;
+		let implementsInterface = null;
 
-		if (config.project.typescript) {
-			template = insertBeforeSpace(template, `\ninterface Props {\n    \n};\n`);
-		}
+		feature('typescript', () => {
+			const interfaceName = `${casing.pascal(name)}Props`;
+
+			implementsInterface =
+				config.project.typescript || options.typescript ? `React.SFC<${interfaceName}>` : null;
+
+			template.generateInterface(interfaceName, '', '', { newLine: { beforeCount: 1, afterCount: 1 } });
+		});
+
+		template.generateFunction({
+			name: casing.pascal(name),
+			arrow: true,
+			immidiateReturn: true,
+			interfaceName: implementsInterface,
+			content: div.toString(),
+			insertOptions: { newLine: { beforeCount: 1 } },
+		});
 	} else {
-		template =
-			template +
-			`\nclass ${casing.pascal(
-				name
-			)} extends React.Component {\n     render() {\n        <div className="${casing.kebab(
-				name
-			)}"></div>;\n    }\n}`;
+		template.generateClass({
+			name: casing.pascal(name),
+			extendsName: 'React.Component',
+			methods: [
+				{
+					name: 'render',
+					content: div.toString(),
+				},
+			],
+		});
 	}
 
 	if (config.style.type === 'styled-components') {
-		template = `import React from 'react';\n\nconst ${casing.pascal(name)} = styled.div${'`\n\n`'};`;
+		template.insert(
+			`import React from 'react';\n\nconst ${casing.pascal(name)} = styled.div${'`\n\n`'};`
+		);
 	}
 
-	template = exportStatement(template, casing.pascal(name), true);
+	template.exportStatement(casing.pascal(name), true, '', { newLine: { beforeCount: 1 } });
 
 	feature('style', () => {
-		template = includeStyle(template, name, config.style);
-	});
-	feature('proptypes', () => {
-		template = includeProptypes(template, name);
-	});
-	feature('redux', () => {
-		template = includeRedux(template, options.class);
+		_includeStyle(template, name, config.style);
 	});
 
-	return template;
+	feature('proptypes', () => {
+		_includeProptypes(template, name);
+	});
+
+	feature('redux', () => {
+		_includeRedux(template, options.class);
+	});
+
+	return template.toString();
 }
 
 function create(
@@ -113,7 +150,7 @@ function create(
 	constraints: Constraints,
 	config: Config
 ) {
-	const template = generateTemplate(name, options, constraints, config);
+	const template = _generateTemplate(name, options, constraints, config);
 	const fileExtension = config.project.typescript ? '.tsx' : '.jsx';
 	const filePath = path.resolve(componentPath, name + fileExtension);
 

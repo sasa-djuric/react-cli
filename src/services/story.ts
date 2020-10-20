@@ -1,28 +1,44 @@
 import fs from 'fs';
 import path from 'path';
 import casing from 'case';
-import { exportStatement, importStatement } from '../utils/template';
+import JSTemplateBuilder from '../builders/js-template-builder';
 
 function create(name: string, config: { typescript: boolean }, componentPath: string) {
-	let template = '';
-	const extension = config.typescript ? '.ts' : 'js';
+	const template = new JSTemplateBuilder({ indent: 4 });
+	const extension = config.typescript ? '.ts' : '.js';
 	const fileName = name + '.story' + extension;
 	const componentName = casing.pascal(name);
+	const templateComponent = new JSTemplateBuilder({ indent: 4 });
 
-	template = importStatement(template, 'React', 'react');
-	template = importStatement(template, componentName, `./${name}${extension}`);
-	template = exportStatement(
-		template,
+	templateComponent.generateDOMElement({ tag: componentName, spreadProps: true, selfClosing: true });
+
+	template.insertImportStatement('React', 'react');
+	template.insertImportStatement(componentName, `./${name}${extension}`);
+	template.exportStatement(
 		`{\n    title: 'Components/${componentName}',\n    component: ${componentName}\n}`,
 		true,
 		undefined,
-		false
+		{ newLine: { beforeCount: 1 } }
 	);
-	template = template + `\n\nconst Template = (args) => <${componentName} {...props} />;`;
-	template = exportStatement(template, `const Primary = Template.bind({})`, false);
-	template = template + `\n\nPrimary.args = {\n    \n};`;
+	template.generateFunction({
+		name: 'Template',
+		args: ['args'],
+		arrow: true,
+		content: templateComponent.toString(),
+		body: false,
+		insertOptions: {
+			newLine: {
+				beforeCount: 2,
+			},
+		},
+	});
 
-	fs.writeFileSync(path.resolve(componentPath, fileName), template, { encoding: 'utf-8' });
+	template.exportStatement(`const Primary = Template.bind({})`, false, undefined, {
+		newLine: { beforeCount: 1 },
+	});
+	template.insert(`Primary.args = {\n{{{indent}}}\n};`, { newLine: { beforeCount: 2 } });
+
+	fs.writeFileSync(path.resolve(componentPath, fileName), template.toString(), { encoding: 'utf-8' });
 }
 
 export default { create };
