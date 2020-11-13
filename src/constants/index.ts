@@ -1,16 +1,17 @@
 import { Config } from '../types/config';
 
 export const projectTypes = [
-	{ name: 'cra', label: 'Create React App' },
-	{ name: 'next', label: 'Next' },
-	{ name: 'gatsby', label: 'Gatsby' },
+	{ name: 'Create React App', value: 'cra' },
+	{ name: 'Next', value: 'next' },
+	{ name: 'Gatsby', value: 'gatsby' },
 ];
 
-export const styleTypes = ['css', 'scss', 'saas', 'less', 'styled-components'];
+export const cssStyleTypes = ['css', 'scss', 'sass', 'less'];
+export const jsStyleTypes = ['styled-components'];
+export const styleTypes = [...cssStyleTypes, ...jsStyleTypes];
 
 export const defaultConfig: Config = {
 	project: {
-		type: 'cra',
 		typescript: false,
 	},
 	component: {
@@ -28,5 +29,6 @@ export const defaultConfig: Config = {
 	style: {
 		type: 'scss',
 		modules: false,
+		naming: 'string',
 	},
 };

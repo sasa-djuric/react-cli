@@ -1,14 +1,13 @@
 #! /usr/bin/env node
 
-// // Libs
-// import clear from 'clear';
-// import figlet from 'figlet';
+// Libs
+import clear from 'clear';
 import program from 'commander';
 import actions from './actions';
 import { parseConstraints, parseOptions } from './utils';
 
 (() => {
-	// clear();
+	clear();
 	program.version('1.0.0').description('React CLI');
 	program.command('init').description('Initialize react-cli config').action(actions.init);
 	program
@@ -32,7 +31,5 @@ import { parseConstraints, parseOptions } from './utils';
 		.action((type, name, params) => {
 			actions[type].create(name, parseOptions(params), parseConstraints(params));
 		});
-	program.command('delete component').action(actions.component.delete);
-	program.command('rename component').action(actions.component.rename);
 	program.parse(process.argv);
 })();

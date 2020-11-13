@@ -41,7 +41,10 @@ function create(name: string, options: Options, constraints: Constraints) {
 		config.component.inFolder ? namePreferred : ''
 	);
 	const fileExtension = config.project.typescript ? '.tsx' : '.jsx';
-	const filePath = path.resolve(componentPath, name + fileExtension);
+	const filePath = path.resolve(
+		componentPath,
+		name + (config.component.fileNamePostfix || '') + fileExtension
+	);
 	const feature = featureToggle('component', config, options, constraints);
 
 	try {
@@ -61,7 +64,7 @@ function create(name: string, options: Options, constraints: Constraints) {
 			makeIndexFileExport(
 				componentPath,
 				namePascal,
-				namePreferred,
+				namePreferred + (config.component.fileNamePostfix || ''),
 				config.project.typescript ? 'ts' : 'js'
 			);
 		});
@@ -85,12 +88,4 @@ function create(name: string, options: Options, constraints: Constraints) {
 	}
 }
 
-function _delete(params: any) {
-	console.log('delete component');
-}
-
-function rename(params: any) {
-	console.log('rename component');
-}
-
-export default { create, delete: _delete, rename };
+export default { create };

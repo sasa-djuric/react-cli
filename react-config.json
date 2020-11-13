@@ -1,22 +1,36 @@
 {
 	"project": {
 		"type": "cra",
-		"typescript": false
+		"typescript": true
 	},
 	"component": {
 		"style": true,
 		"story": false,
 		"test": false,
-		"proptypes": false,
-		"index": false,
+		"proptypes": true,
+		"naming": "name",
+		"fileNamePostfix": ".component",
+		"index": true,
 		"inFolder": true,
 		"casing": "kebab",
-		"naming": "name",
 		"open": true,
 		"path": "src/components"
 	},
+	"page": {
+		"style": true,
+		"story": false,
+		"test": false,
+		"proptypes": true,
+		"naming": "name",
+		"fileNamePostfix": ".page",
+		"index": true,
+		"inFolder": true,
+		"casing": "kebab",
+		"open": true,
+		"path": "src/pages"
+	},
 	"style": {
-		"type": "scss",
-		"modules": false
+		"type": "styled-components",
+		"naming": "styles"
 	}
 }

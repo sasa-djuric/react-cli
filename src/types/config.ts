@@ -1,13 +1,14 @@
-export type styleType = 'css' | 'scss' | 'saas' | 'less' | 'styled-components';
+export type cssStyleType = 'css' | 'sass' | 'scss' | 'less';
+export type jsStyleType = 'styled-components';
+export type styleType = cssStyleType | jsStyleType;
 export type projectType = 'cra' | 'next' | 'gatsby';
 export type testingLib = 'jest' | 'enzyme' | 'react-testing';
 export interface ProjectConfig {
-	type: projectType;
 	typescript: boolean;
-	indentation?: number;
 }
 
 export interface ComponentConfig {
+	typescript?: boolean;
 	path: string;
 	style: boolean;
 	story: boolean;
@@ -18,11 +19,13 @@ export interface ComponentConfig {
 	open: boolean;
 	casing: 'kebab' | 'snake' | 'camel' | 'pascal';
 	naming: 'name' | 'index';
+	fileNamePostfix?: string;
 }
 
 export interface StyleConfig {
-	type: 'css' | 'scss' | 'saas' | 'less' | 'styled-components';
+	type: styleType;
 	modules: boolean;
+	naming: string;
 }
 
 export interface Config {

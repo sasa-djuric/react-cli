@@ -56,18 +56,6 @@ export function getProjectRoot() {
 	throw new Error('Project not found');
 }
 
-export function dependencyExists(dependency: string) {
-	try {
-		const packageFile = path.resolve(getProjectRoot(), 'package.json');
-		const packageJson = JSON.parse(fs.readFileSync(packageFile, { encoding: 'utf-8' }));
-		const dependencies = { ...packageJson.dependencies, ...packageJson.devDependencies };
-
-		return !!Object.keys(dependencies).find(dep => dep.includes(dependency));
-	} catch (err) {
-		return;
-	}
-}
-
 export function featureToggle(
 	scope: 'project' | 'component' | 'style',
 	config: any,

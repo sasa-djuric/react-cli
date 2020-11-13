@@ -1,16 +1,10 @@
+// Utils
 import { conditionalString } from '../utils';
-import TemplateBuilder from './template-builder';
 
-interface InsertOptions {
-	newLine?: {
-		beforeCount?: number;
-		afterCount?: number;
-	};
-	insertAfter?: string;
-	insertBefore?: string;
-}
+// Builders
+import TemplateBuilder, { InsertOptions } from './template-builder';
 
-interface GenerateDOMElement {
+interface InsertDOMElement {
 	tag: string;
 	props?: { [key: string]: string };
 	selfClosing?: boolean;
@@ -19,14 +13,15 @@ interface GenerateDOMElement {
 	insertOptions?: InsertOptions;
 }
 
-interface GenerateClass {
+interface InsertClass {
 	name: string;
 	extendsName: string;
 	methods: { name: string; args?: string[]; content: string }[];
+	extendsTypeArguments?: any[];
 	insertOptions?: InsertOptions;
 }
 
-interface GenerateFunction {
+interface InsertFunction {
 	name?: string;
 	args?: string[];
 	arrow?: boolean;
@@ -40,25 +35,44 @@ interface GenerateFunction {
 }
 
 class JSTemplateBuilder extends TemplateBuilder {
+	constructor() {
+		super('js');
+	}
+
+	private compileTypeArguments(args: any[]): string {
+		const concat = (acc: string, cur: string) => (acc ? `${acc}, ${cur}` : cur);
+
+		return args.reduce((acc, arg) =>
+			concat(
+				acc,
+				typeof arg === 'object' ? `${arg.type}<${this.compileTypeArguments(arg.arguments)}>` : arg
+			)
+		);
+	}
+
 	public insertImportStatement(
 		importName: string,
 		filePath: string,
 		importAll = false,
 		insertOptions?: InsertOptions
-	): string {
+	) {
 		const statement = `import ${conditionalString(importName && importAll, '* as ')}${
 			importName ? importName + ' from ' : ''
-		}'${filePath}';\n`;
+		}'${filePath}';`;
 
-		return this.insert(statement, { insertAfter: 'import', ...insertOptions });
+		return this.insert(statement, {
+			insertAfter: 'import',
+			newLine: { afterCount: 1 },
+			...insertOptions,
+		});
 	}
 
-	public exportStatement(
+	public insertExportStatement(
 		exportName: string,
 		defaultExport: boolean,
 		wrapExport?: string,
 		insertOptions?: InsertOptions
-	): string {
+	) {
 		const statement = `export ${conditionalString(defaultExport, 'default ')}${conditionalString(
 			wrapExport
 		)}${wrapExport ? `(${exportName})` : exportName};`;
@@ -66,7 +80,7 @@ class JSTemplateBuilder extends TemplateBuilder {
 		return this.insert(statement, insertOptions);
 	}
 
-	public generateFunction({
+	public insertFunction({
 		name,
 		args = [],
 		arrow = false,
@@ -77,16 +91,14 @@ class JSTemplateBuilder extends TemplateBuilder {
 		interfaceName,
 		content = '',
 		insertOptions,
-	}: GenerateFunction): string {
+	}: InsertFunction) {
 		const asyncStr = async ? 'async ' : '';
 		const interfaceArrow = interfaceName ? ': ' + interfaceName : '';
 		const interfaceFunction = interfaceName ? `<${interfaceName}>` : '';
 		const declaration = !arrow
 			? `${asyncStr}function ${interfaceFunction}${name}`
 			: `const ${name}${interfaceArrow} = ${asyncStr}`;
-		const contentBody = body
-			? `{\n{{{indent}}}${body && immidiateReturn ? 'return ' : ''}${content}\n}`
-			: content;
+		const contentBody = body ? `{\n${body && immidiateReturn ? 'return ' : ''}${content}\n}` : content;
 		const template = `${!anonymous ? declaration : ''}(${args.join(', ')}) ${
 			arrow ? '=> ' : ''
 		}${contentBody}${arrow ? ';' : ''}\n`;
@@ -94,45 +106,42 @@ class JSTemplateBuilder extends TemplateBuilder {
 		return this.insert(template, insertOptions);
 	}
 
-	public generateClass({ name, extendsName, methods, insertOptions }: GenerateClass): string {
+	public insertClass({ name, extendsName, methods, extendsTypeArguments, insertOptions }: InsertClass) {
 		const packedMethods = methods.reduce((acc, cur, index) => {
 			const packedArgs = cur.args?.join(', ') ?? '';
 			const isLast = methods.length - 1 === index;
 
-			return `${acc}${cur.name}(${packedArgs}) {\n{{{indent}}}{{{indent}}}${
-				cur.content || ''
-			}\n{{{indent}}}}${!isLast ? '\n\n{{{indent}}}' : ''}`;
+			return `${acc}${cur.name}(${packedArgs}) {\n${cur.content || ''}\n}${!isLast ? '\n\n' : ''}`;
 		}, '');
 		const template = `class ${name}${
-			extendsName ? ` extends ${extendsName}` : ''
-		} {\n{{{indent}}}${packedMethods}\n}`;
+			extendsName
+				? ` extends ${extendsName}${
+						extendsTypeArguments ? `<${this.compileTypeArguments(extendsTypeArguments)}>` : ''
+				  }`
+				: ''
+		} {\n${packedMethods}\n}`;
 
 		return this.insert(template, insertOptions);
 	}
 
-	public generateInterface(
-		name: string,
-		extendsName: string,
-		content = {},
-		insertOptions?: InsertOptions
-	): string {
+	public insertInterface(name: string, extendsName: string, content = {}, insertOptions?: InsertOptions) {
 		const contentDraft =
 			Object.keys(content).length &&
 			JSON.stringify(content, null, 4).split('"').join('').split(',').join(';').substr(6);
 		const packedContent = contentDraft ? contentDraft.substr(0, contentDraft.length - 2) + ';' : '';
-		const template = `interface ${name}${extendsName} {\n{{{indent}}}${packedContent}\n}`;
+		const template = `interface ${name}${extendsName} {\n${packedContent}\n}`;
 
 		return this.insert(template, insertOptions);
 	}
 
-	public generateDOMElement({
+	public insertElement({
 		tag,
 		props = {},
 		selfClosing = false,
 		children = '',
 		spreadProps,
 		insertOptions,
-	}: GenerateDOMElement): string {
+	}: InsertDOMElement) {
 		const packedProps = Object.entries(props)
 			.map(([key, value]) => `${key}="${value}"`)
 			.join(' ');
@@ -144,14 +153,7 @@ class JSTemplateBuilder extends TemplateBuilder {
 	}
 
 	public wrapExport(wrapper: string): void {
-		const exportIndex = this.toString().indexOf('export default');
-		const exportName = this.toString().substr(
-			exportIndex + 15,
-			this.toString().lastIndexOf(';') - (exportIndex + 15)
-		);
-		const template = this.toString().substr(0, exportIndex + 15) + wrapper + `(${exportName});`;
-
-		this.override(template);
+		this.wrap('export default ', ';', `${wrapper}(`, ')');
 	}
 }
 

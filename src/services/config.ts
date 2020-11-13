@@ -5,8 +5,14 @@ import { Config } from '../types/config';
 import { getProjectRoot } from '../utils';
 import { defaultConfig } from '../constants';
 
-function detectTypescript() {
+function _detectTypescript() {
 	return fs.existsSync(path.resolve(getProjectRoot(), 'tsconfig.json'));
+}
+
+function _adjustConfig(config: Config) {
+	config.component.typescript = config.project.typescript;
+
+	return config;
 }
 
 function get(): Config {
@@ -15,11 +21,11 @@ function get(): Config {
 	const local = path.resolve(getProjectRoot(), fileName);
 
 	if (fs.existsSync(local)) {
-		return JSON.parse(fs.readFileSync(local, { encoding: 'utf8' }));
+		return _adjustConfig(JSON.parse(fs.readFileSync(local, { encoding: 'utf8' })));
 	} else if (fs.existsSync(global)) {
-		return JSON.parse(fs.readFileSync(global, { encoding: 'utf8' }));
+		return _adjustConfig(JSON.parse(fs.readFileSync(global, { encoding: 'utf8' })));
 	} else {
-		return defaultConfig;
+		return _adjustConfig(defaultConfig);
 	}
 }
 
@@ -29,7 +35,7 @@ function create(config: any, scope: 'global' | 'project') {
 	const local = path.resolve(getProjectRoot(), fileName);
 
 	if (scope === 'project') {
-		config.project.typescript = detectTypescript();
+		config.project.typescript = _detectTypescript();
 	}
 
 	fs.writeFileSync(scope === 'global' ? global : local, JSON.stringify(config, null, 4), {

@@ -3,34 +3,72 @@ import casing from 'case';
 import fs from 'fs';
 import path from 'path';
 
+// Builders
+import CSSTemplateBuilder from '../builders/css-template-builder';
+import JSTemplateBuilder from '../builders/js-template-builder';
+
+// Constants
+import { cssStyleTypes } from '../constants';
+
 // Types
-import { styleType } from '../types/config';
+import { cssStyleType, jsStyleType, StyleConfig, styleType } from '../types/config';
 
-function create(name: string, config: { modules: boolean; type: styleType }, filePath: string) {
-	if (config.type === 'styled-components') return;
-	const draft = `.${casing.kebab(name)} {\n   \n}`;
-	const styles: { [key: string]: { template: string; extension: string } } = {
-		css: {
-			template: draft,
-			extension: '.css',
-		},
-		scss: {
-			template: draft,
-			extension: '.scss',
-		},
-		saas: {
-			template: `.${casing.kebab(name)}\n		`,
-			extension: '.saas',
-		},
-		less: {
-			template: draft,
-			extension: '.less',
-		},
-	};
-	const filename = name + (config.modules ? '.module' : '') + styles[config.type].extension;
-	const template = styles[config.type].template;
+function getStylingType(type: styleType) {
+	if (cssStyleTypes.some(value => type === value)) {
+		return 'css';
+	}
 
-	fs.writeFileSync(path.resolve(filePath, filename), template, { encoding: 'utf-8' });
+	return 'js';
 }
 
-export default { create };
+function _generateCSSTemplate(name: string, type: cssStyleType) {
+	const template = new CSSTemplateBuilder(type);
+
+	template.insertClass(casing.kebab(name));
+
+	return template.toString();
+}
+
+function _generateJSTemplate(name: string, type: jsStyleType) {
+	const template = new JSTemplateBuilder();
+
+	template
+		.insertImportStatement('{ styled }', 'styled-components', false, { newLine: { afterCount: 2 } })
+		.insertExportStatement(`const ${casing.pascal(name)}Element = styled.div\`\n\n\``, false);
+
+	return template.toString();
+}
+
+function _generateTemplate(name: string, type: styleType) {
+	if (getStylingType(type) === 'css') {
+		// @ts-ignore
+		return _generateCSSTemplate(name, type);
+	}
+
+	// @ts-ignore
+	return _generateJSTemplate(name, type);
+}
+
+function _getFileName(name: string, config: StyleConfig) {
+	const stylingType = getStylingType(config.type);
+	const filenamePostfix = config.modules ? '.module' : '';
+	const extension = stylingType === 'js' ? 'js' : config.type;
+
+	if (config.naming !== 'componentName') {
+		return `${config.naming}${filenamePostfix}.${extension}`;
+	}
+
+	return `${name}${filenamePostfix}.${extension}`;
+}
+
+function create(name: string, config: StyleConfig, filePath: string) {
+	fs.writeFileSync(
+		path.resolve(filePath, _getFileName(name, config)),
+		_generateTemplate(name, config.type),
+		{
+			encoding: 'utf-8',
+		}
+	);
+}
+
+export default { create, getStylingType };

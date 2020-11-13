@@ -1,21 +1,22 @@
-import _ from 'lodash';
+// @ts-ignore
+import indentJs from 'indent.js';
 
-interface InsertOptions {
+export interface InsertOptions {
 	newLine?: {
 		beforeCount?: number;
 		afterCount?: number;
 	};
 	insertAfter?: string;
 	insertBefore?: string;
+	insertAtIndex?: number;
 }
+
+export type fileType = 'js' | 'ts' | 'css' | 'scss';
 
 class TemplateBuilder {
 	private template: string = '';
-	private config;
 
-	constructor(config?: { indent?: number }) {
-		this.config = config;
-	}
+	constructor(private fileType: fileType) {}
 
 	private lineAfterIndex(content: string, text: string) {
 		const index = content.lastIndexOf(text) + 1;
@@ -31,16 +32,31 @@ class TemplateBuilder {
 		return endIndex;
 	}
 
-	private insertOnIndex(content: string, insert: string, index: number) {
+	private insertAtIndex(content: string, insert: string, index: number) {
 		return content.substr(0, index) + insert + content.substr(index);
 	}
 
-	private indent(str: string) {
-		const space = new Array(this.config?.indent).fill(' ').join('');
-		return _.replace(str, /{{{indent}}}/g, space);
+	private indent(code: string) {
+		const indent = new Array(1).fill('\t').join('');
+		return indentJs[this.fileType](code, { tabString: indent });
 	}
 
-	public insert(content: string, options?: InsertOptions): string {
+	public wrap(wrapAfterIndexOf: string, wrapToIndexOf: string, strBefore: string, strAfter: string) {
+		const startIndex = this.template.indexOf(wrapAfterIndexOf) + wrapAfterIndexOf.length;
+		const exportName = this.template.substr(
+			startIndex,
+			this.template.lastIndexOf(wrapToIndexOf) - startIndex
+		);
+		const start = this.template.substr(0, startIndex);
+		const wrappedExport = strBefore + exportName + strAfter;
+		const endStartIndex = startIndex + exportName.length;
+		const end = this.template.substr(endStartIndex);
+		const template = start + wrappedExport + end;
+
+		this.override(template);
+	}
+
+	public insert(content: string, options?: InsertOptions) {
 		const newLineBefore = options?.newLine?.beforeCount
 			? new Array(options.newLine.beforeCount).fill('\n').join('')
 			: '';
@@ -50,26 +66,28 @@ class TemplateBuilder {
 		const draft = newLineBefore + content + newLineAfter;
 
 		if (options?.insertAfter) {
-			const index = this.lineAfterIndex(this.toString(), options.insertAfter);
-			this.template = this.insertOnIndex(this.template, draft, index);
+			const index = this.lineAfterIndex(this.template, options.insertAfter);
+			this.template = this.insertAtIndex(this.template, draft, index);
 		} else if (options?.insertBefore) {
-			const index = this.lineBeforeIndex(this.template.toString(), options?.insertBefore);
-			this.template = this.insertOnIndex(this.template, draft, index);
+			const index = this.lineBeforeIndex(this.template, options?.insertBefore);
+			this.template = this.insertAtIndex(this.template, draft, index);
+		} else if (options?.insertAtIndex) {
+			this.template = this.insertAtIndex(this.template, content, options.insertAtIndex);
 		} else {
 			this.template = this.template + draft;
 		}
 
-		this.template = this.indent(this.template);
-
-		return this.template;
+		return this;
 	}
 
 	public override(content: string) {
 		this.template = content;
+
+		return this;
 	}
 
 	public toString(): string {
-		return this.template;
+		return this.indent(this.template);
 	}
 }
 
