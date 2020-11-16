@@ -4,12 +4,13 @@ export type styleType = cssStyleType | jsStyleType;
 export type projectType = 'cra' | 'next' | 'gatsby';
 export type testingLib = 'jest' | 'enzyme' | 'react-testing';
 export interface ProjectConfig {
+	path: string;
 	typescript: boolean;
 }
 
 export interface ComponentConfig {
+	directory: string;
 	typescript?: boolean;
-	path: string;
 	style: boolean;
 	story: boolean;
 	proptypes: boolean;
@@ -28,7 +29,7 @@ export interface StyleConfig {
 	naming: string;
 }
 
-export interface Config {
+interface IConfig {
 	project: ProjectConfig;
 	component: ComponentConfig;
 	style: StyleConfig;
@@ -36,3 +37,5 @@ export interface Config {
 	redux?: {};
 	testing?: {};
 }
+
+export type Config = { [key: string]: ComponentConfig } & IConfig;

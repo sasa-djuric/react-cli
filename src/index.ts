@@ -3,8 +3,21 @@
 // Libs
 import clear from 'clear';
 import program from 'commander';
+
+// Actions
 import actions from './actions';
-import { parseConstraints, parseOptions } from './utils';
+
+// Services
+import configService from './services/config';
+import featureTogglingService from './services/feature-toggling';
+
+function _validateType(type: string) {
+	const config = configService.get();
+
+	if (config[type] && !(type === 'project' || type === 'style')) {
+		return 'component';
+	}
+}
 
 (() => {
 	clear();
@@ -29,7 +42,18 @@ import { parseConstraints, parseOptions } from './utils';
 		.option('-noi, --no-index')
 		.option('--no-story')
 		.action((type, name, params) => {
-			actions[type].create(name, parseOptions(params), parseConstraints(params));
+			const typeResult = _validateType(type);
+
+			if (typeResult) {
+				actions[typeResult].create(
+					name,
+					featureTogglingService.parseOptions(params),
+					featureTogglingService.parseConstraints(params),
+					type
+				);
+			} else {
+				console.error('Wrong create type');
+			}
 		});
 	program.parse(process.argv);
 })();

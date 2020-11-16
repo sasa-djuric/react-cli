@@ -45,7 +45,9 @@ class JSTemplateBuilder extends TemplateBuilder {
 		return args.reduce((acc, arg) =>
 			concat(
 				acc,
-				typeof arg === 'object' ? `${arg.type}<${this.compileTypeArguments(arg.arguments)}>` : arg
+				typeof arg === 'object'
+					? `${arg.type}<${this.compileTypeArguments(arg.arguments)}>`
+					: arg
 			)
 		);
 	}
@@ -73,9 +75,10 @@ class JSTemplateBuilder extends TemplateBuilder {
 		wrapExport?: string,
 		insertOptions?: InsertOptions
 	) {
-		const statement = `export ${conditionalString(defaultExport, 'default ')}${conditionalString(
-			wrapExport
-		)}${wrapExport ? `(${exportName})` : exportName};`;
+		const statement = `export ${conditionalString(
+			defaultExport,
+			'default '
+		)}${conditionalString(wrapExport)}${wrapExport ? `(${exportName})` : exportName};`;
 
 		return this.insert(statement, insertOptions);
 	}
@@ -98,7 +101,9 @@ class JSTemplateBuilder extends TemplateBuilder {
 		const declaration = !arrow
 			? `${asyncStr}function ${interfaceFunction}${name}`
 			: `const ${name}${interfaceArrow} = ${asyncStr}`;
-		const contentBody = body ? `{\n${body && immidiateReturn ? 'return ' : ''}${content}\n}` : content;
+		const contentBody = body
+			? `{\n${body && immidiateReturn ? 'return ' : ''}${content}\n}`
+			: content;
 		const template = `${!anonymous ? declaration : ''}(${args.join(', ')}) ${
 			arrow ? '=> ' : ''
 		}${contentBody}${arrow ? ';' : ''}\n`;
@@ -106,17 +111,27 @@ class JSTemplateBuilder extends TemplateBuilder {
 		return this.insert(template, insertOptions);
 	}
 
-	public insertClass({ name, extendsName, methods, extendsTypeArguments, insertOptions }: InsertClass) {
+	public insertClass({
+		name,
+		extendsName,
+		methods,
+		extendsTypeArguments,
+		insertOptions,
+	}: InsertClass) {
 		const packedMethods = methods.reduce((acc, cur, index) => {
 			const packedArgs = cur.args?.join(', ') ?? '';
 			const isLast = methods.length - 1 === index;
 
-			return `${acc}${cur.name}(${packedArgs}) {\n${cur.content || ''}\n}${!isLast ? '\n\n' : ''}`;
+			return `${acc}${cur.name}(${packedArgs}) {\n${cur.content || ''}\n}${
+				!isLast ? '\n\n' : ''
+			}`;
 		}, '');
 		const template = `class ${name}${
 			extendsName
 				? ` extends ${extendsName}${
-						extendsTypeArguments ? `<${this.compileTypeArguments(extendsTypeArguments)}>` : ''
+						extendsTypeArguments
+							? `<${this.compileTypeArguments(extendsTypeArguments)}>`
+							: ''
 				  }`
 				: ''
 		} {\n${packedMethods}\n}`;
@@ -124,11 +139,18 @@ class JSTemplateBuilder extends TemplateBuilder {
 		return this.insert(template, insertOptions);
 	}
 
-	public insertInterface(name: string, extendsName: string, content = {}, insertOptions?: InsertOptions) {
+	public insertInterface(
+		name: string,
+		extendsName: string,
+		content = {},
+		insertOptions?: InsertOptions
+	) {
 		const contentDraft =
 			Object.keys(content).length &&
 			JSON.stringify(content, null, 4).split('"').join('').split(',').join(';').substr(6);
-		const packedContent = contentDraft ? contentDraft.substr(0, contentDraft.length - 2) + ';' : '';
+		const packedContent = contentDraft
+			? contentDraft.substr(0, contentDraft.length - 2) + ';'
+			: '';
 		const template = `interface ${name}${extendsName} {\n${packedContent}\n}`;
 
 		return this.insert(template, insertOptions);
@@ -145,9 +167,9 @@ class JSTemplateBuilder extends TemplateBuilder {
 		const packedProps = Object.entries(props)
 			.map(([key, value]) => `${key}="${value}"`)
 			.join(' ');
-		const template = `<${tag}${packedProps ? ' ' + packedProps : ''}${spreadProps ? ' {...props} ' : ''}${
-			selfClosing ? '/>' : '>'
-		}${!selfClosing ? `${children}</${tag}>` : ''}`;
+		const template = `<${tag}${packedProps ? ' ' + packedProps : ''}${
+			spreadProps ? ' {...props} ' : ''
+		}${selfClosing ? '/>' : '>'}${!selfClosing ? `${children}</${tag}>` : ''}`;
 
 		return this.insert(template, insertOptions);
 	}

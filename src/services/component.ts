@@ -8,7 +8,7 @@ import fs from 'fs';
 import path from 'path';
 
 // Utils
-import { conditionalString, featureToggle } from '../utils';
+import { conditionalString } from '../utils';
 import dependency from '../utils/dependency';
 
 // Buidlers
@@ -16,6 +16,7 @@ import JSTemplateBuilder from '../builders/js-template-builder';
 
 // Services
 import styleService from './style';
+import featureTogglingService from '../services/feature-toggling';
 
 function _includeRedux(template: JSTemplateBuilder) {
 	template
@@ -84,7 +85,9 @@ function _includeStyle(template: JSTemplateBuilder, name: string, config: StyleC
 			)
 			.insertElement({
 				tag: elementName,
-				insertOptions: { insertAtIndex: templateString.indexOf('<div') },
+				insertOptions: {
+					insertAtIndex: templateString.indexOf('<div'),
+				},
 			})
 			.insertImportStatement(`{ ${elementName} }`, importPath);
 	}
@@ -98,8 +101,13 @@ function _includeProptypes(template: JSTemplateBuilder, name: string) {
 		.insert(draft, { newLine: { beforeCount: 1 }, insertBefore: 'export' });
 }
 
-function _generateTemplate(name: string, options: Options, constraints: Constraints, config: Config) {
-	const feature = featureToggle('component', config, options, constraints);
+function _generateTemplate(
+	name: string,
+	options: Options,
+	constraints: Constraints,
+	config: Config
+) {
+	const feature = featureTogglingService.toggle('component', config, options, constraints);
 	const template = new JSTemplateBuilder();
 	const element = new JSTemplateBuilder();
 	const reactVersion = +dependency.getVersion('react')?.replace(/\^|\./g, '') ?? 0;
@@ -108,7 +116,10 @@ function _generateTemplate(name: string, options: Options, constraints: Constrai
 		template.insertImportStatement('React', 'react');
 	}
 
-	element.insertElement({ tag: 'div', props: { className: casing.kebab(name) } });
+	element.insertElement({
+		tag: 'div',
+		props: { className: casing.kebab(name) },
+	});
 
 	if (!options.class) {
 		let implementsInterface = null;
@@ -117,9 +128,13 @@ function _generateTemplate(name: string, options: Options, constraints: Constrai
 			const interfaceName = `${casing.pascal(name)}Props`;
 
 			implementsInterface =
-				config.project.typescript || options.typescript ? `React.SFC<${interfaceName}>` : null;
+				config.project.typescript || options.typescript
+					? `React.SFC<${interfaceName}>`
+					: null;
 
-			template.insertInterface(interfaceName, '', '', { newLine: { afterCount: 1 } });
+			template.insertInterface(interfaceName, '', '', {
+				newLine: { afterCount: 1 },
+			});
 		});
 
 		template.insertFunction({
@@ -136,8 +151,12 @@ function _generateTemplate(name: string, options: Options, constraints: Constrai
 		feature('typescript', () => {
 			withTypescript = true;
 
-			template.insertInterface('Props', '', '', { newLine: { afterCount: 1 } });
-			template.insertInterface('State', '', '', { newLine: { beforeCount: 1, afterCount: 1 } });
+			template.insertInterface('Props', '', '', {
+				newLine: { afterCount: 1 },
+			});
+			template.insertInterface('State', '', '', {
+				newLine: { beforeCount: 1, afterCount: 1 },
+			});
 		});
 
 		template.insertClass({
@@ -154,7 +173,9 @@ function _generateTemplate(name: string, options: Options, constraints: Constrai
 		});
 	}
 
-	template.insertExportStatement(casing.pascal(name), true, '', { newLine: { beforeCount: 1 } });
+	template.insertExportStatement(casing.pascal(name), true, '', {
+		newLine: { beforeCount: 1 },
+	});
 
 	feature('style', () => {
 		_includeStyle(template, name, config.style);

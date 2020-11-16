@@ -41,7 +41,12 @@ class TemplateBuilder {
 		return indentJs[this.fileType](code, { tabString: indent });
 	}
 
-	public wrap(wrapAfterIndexOf: string, wrapToIndexOf: string, strBefore: string, strAfter: string) {
+	public wrap(
+		wrapAfterIndexOf: string,
+		wrapToIndexOf: string,
+		strBefore: string,
+		strAfter: string
+	) {
 		const startIndex = this.template.indexOf(wrapAfterIndexOf) + wrapAfterIndexOf.length;
 		const exportName = this.template.substr(
 			startIndex,

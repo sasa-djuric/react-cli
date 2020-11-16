@@ -2,7 +2,7 @@
 import inquirer from 'inquirer';
 
 // Constants
-import { cssStyleTypes, projectTypes, styleTypes } from '../constants';
+import { cssStyleTypes, styleTypes } from '../constants';
 
 // Services
 import configService from '../services/config';
@@ -24,13 +24,27 @@ function project(scope: scope) {
 function component(scope: scope) {
 	return inquirer
 		.prompt([
-			{ type: 'confirm', name: 'defaultPath', message: 'Component path src/components ?' },
-			{ type: 'input', name: 'path', message: 'Component path', when: answers => !answers.defaultPath },
+			{
+				type: 'confirm',
+				name: 'defaultPath',
+				message: 'Component path src/components ?',
+			},
+			{
+				type: 'input',
+				name: 'path',
+				message: 'Component path',
+				when: (answers) => !answers.defaultPath,
+			},
 			{ type: 'confirm', name: 'style', message: 'Create style file?' },
 			{ type: 'confirm', name: 'story', message: 'Create story file?' },
 			{ type: 'confirm', name: 'test', message: 'Create test file?' },
 			{ type: 'confirm', name: 'proptypes', message: 'Use proptypes?' },
-			{ type: 'list', name: 'naming', message: 'File naming', choices: ['name', 'index'] },
+			{
+				type: 'list',
+				name: 'naming',
+				message: 'File naming',
+				choices: ['name', 'index'],
+			},
 			{
 				type: 'input',
 				name: 'fileNamePostfix',
@@ -40,9 +54,13 @@ function component(scope: scope) {
 				type: 'confirm',
 				name: 'index',
 				message: 'Create index export file?',
-				when: result => result.naming !== 'index',
+				when: (result) => result.naming !== 'index',
 			},
-			{ type: 'confirm', name: 'inFolder', message: 'Create folder for component?' },
+			{
+				type: 'confirm',
+				name: 'inFolder',
+				message: 'Create folder for component?',
+			},
 			{
 				type: 'list',
 				name: 'casing',
@@ -90,22 +108,26 @@ function style(scope: scope) {
 				type: 'confirm',
 				name: 'modules',
 				message: 'Use modules',
-				when: result => cssStyleTypes.some(type => result.type === type),
+				when: (result) => cssStyleTypes.some((type) => result.type === type),
 			},
 			{
 				type: 'list',
 				name: 'naming',
 				message: 'Style file naming',
-				choices: [{ name: 'Component name', value: 'componentName' }, 'style', 'other'],
+				choices: [
+					{ name: 'Component name', value: 'componentName' },
+					{ name: 'Style', value: 'style' },
+					{ name: 'Other', value: 'other' },
+				],
 			},
 			{
 				type: 'input',
 				name: 'customStyleNaming',
 				message: 'Input style file name',
-				when: result => result.naming === 'other',
+				when: (result) => result.naming === 'other',
 			},
 		])
-		.then(result => {
+		.then((result) => {
 			if (result.customStyleNaming) {
 				result.naming = result.customStyleNaming;
 				delete result.customStyleNaming;
@@ -113,6 +135,22 @@ function style(scope: scope) {
 
 			return result;
 		});
+}
+
+function getScope() {
+	return inquirer
+		.prompt([
+			{
+				type: 'list',
+				name: 'scope',
+				message: 'For what scope you want to make configuration?',
+				choices: [
+					{ name: 'Global', value: 'global' },
+					{ name: 'Project', value: 'project' },
+				],
+			},
+		])
+		.then((res) => res.scope);
 }
 
 async function Init() {
@@ -123,14 +161,7 @@ async function Init() {
 			{ name: 'component', prompt: component },
 			{ name: 'style', prompt: style },
 		];
-		const { scope } = await inquirer.prompt([
-			{
-				type: 'list',
-				name: 'scope',
-				message: 'For what scope you want to make configuration?',
-				choices: ['global', 'project'],
-			},
-		]);
+		const scope = await getScope();
 
 		for (const part of parts) {
 			config[part.name] = await part.prompt(scope);

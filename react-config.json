@@ -1,9 +1,10 @@
 {
 	"project": {
-		"type": "cra",
+		"path": "./src",
 		"typescript": true
 	},
 	"component": {
+		"directory": "components",
 		"style": true,
 		"story": false,
 		"test": false,
@@ -17,6 +18,7 @@
 		"path": "src/components"
 	},
 	"page": {
+		"directory": "pages",
 		"style": true,
 		"story": false,
 		"test": false,
