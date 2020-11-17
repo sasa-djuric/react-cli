@@ -7,9 +7,11 @@ import program from 'commander';
 // Actions
 import actions from './actions';
 
+// Utils
+import featureToggling from './utils/feature-toggling';
+
 // Services
 import configService from './services/config';
-import featureTogglingService from './services/feature-toggling';
 
 function _validateType(type: string) {
 	const config = configService.get();
@@ -47,8 +49,8 @@ function _validateType(type: string) {
 			if (typeResult) {
 				actions[typeResult].create(
 					name,
-					featureTogglingService.parseOptions(params),
-					featureTogglingService.parseConstraints(params),
+					featureToggling.parseOptions(params),
+					featureToggling.parseConstraints(params),
 					type
 				);
 			} else {

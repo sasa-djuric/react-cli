@@ -25,7 +25,7 @@ function create(name: string, config: { typescript: boolean }, componentPath: st
 			name: 'Template',
 			args: ['args'],
 			arrow: true,
-			content: templateComponent.toString(),
+			content: templateComponent,
 			body: false,
 			insertOptions: {
 				newLine: {
@@ -38,7 +38,9 @@ function create(name: string, config: { typescript: boolean }, componentPath: st
 		})
 		.insert(`Primary.args = {\n\n};`, { newLine: { beforeCount: 2 } });
 
-	fs.writeFileSync(path.resolve(componentPath, fileName), template.toString(), { encoding: 'utf-8' });
+	fs.writeFileSync(path.resolve(componentPath, fileName), template.toString(), {
+		encoding: 'utf-8',
+	});
 }
 
 export default { create };

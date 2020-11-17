@@ -1,6 +1,8 @@
 // @ts-ignore
 import indentJs from 'indent.js';
 
+export type fileType = 'js' | 'ts' | 'css' | 'scss';
+
 export interface InsertOptions {
 	newLine?: {
 		beforeCount?: number;
@@ -11,21 +13,40 @@ export interface InsertOptions {
 	insertAtIndex?: number;
 }
 
-export type fileType = 'js' | 'ts' | 'css' | 'scss';
+interface Actions {
+	[id: number]: Action;
+}
+
+interface Action {
+	type: string;
+	method: Function;
+	args: any[];
+}
+
+interface ActionResult extends Action {
+	id: number;
+}
+
+enum ActionType {
+	Insert = 'insert',
+	Overide = 'overide',
+}
 
 class TemplateBuilder {
 	private template: string = '';
+	private nextId: number = 0;
+	protected actions: Actions = {};
 
 	constructor(private fileType: fileType) {}
 
-	private lineAfterIndex(content: string, text: string) {
+	private lineAfter(content: string, text: string) {
 		const index = content.lastIndexOf(text) + 1;
 		const endIndex = content.substr(index).indexOf(';') + index + 2;
 
 		return endIndex;
 	}
 
-	private lineBeforeIndex(content: string, text: string) {
+	private lineBefore(content: string, text: string) {
 		const index = content.lastIndexOf(text);
 		const endIndex = content.substr(0, index).lastIndexOf('\n');
 
@@ -58,10 +79,10 @@ class TemplateBuilder {
 		const end = this.template.substr(endStartIndex);
 		const template = start + wrappedExport + end;
 
-		this.override(template);
+		this._override(template);
 	}
 
-	public insert(content: string, options?: InsertOptions) {
+	protected _insert(content: string, options?: InsertOptions) {
 		const newLineBefore = options?.newLine?.beforeCount
 			? new Array(options.newLine.beforeCount).fill('\n').join('')
 			: '';
@@ -71,10 +92,10 @@ class TemplateBuilder {
 		const draft = newLineBefore + content + newLineAfter;
 
 		if (options?.insertAfter) {
-			const index = this.lineAfterIndex(this.template, options.insertAfter);
+			const index = this.lineAfter(this.template, options.insertAfter);
 			this.template = this.insertAtIndex(this.template, draft, index);
 		} else if (options?.insertBefore) {
-			const index = this.lineBeforeIndex(this.template, options?.insertBefore);
+			const index = this.lineBefore(this.template, options?.insertBefore);
 			this.template = this.insertAtIndex(this.template, draft, index);
 		} else if (options?.insertAtIndex) {
 			this.template = this.insertAtIndex(this.template, content, options.insertAtIndex);
@@ -85,14 +106,64 @@ class TemplateBuilder {
 		return this;
 	}
 
-	public override(content: string) {
+	public insert(content: string, options?: InsertOptions) {
+		return this.insertAction({
+			type: ActionType.Insert,
+			method: this._insert.bind(this),
+			args: [content, options],
+		});
+	}
+
+	private _override(content: string) {
 		this.template = content;
 
 		return this;
 	}
 
+	public override(content: string) {
+		return this.insertAction({
+			type: ActionType.Overide,
+			method: this._override.bind(this),
+			args: [content],
+		});
+	}
+
+	protected insertAction(options: Action) {
+		this.actions[this.nextId++] = options;
+
+		return this;
+	}
+
+	public getActionsByType(type: string): ActionResult[] {
+		return Object.entries(this.actions).reduce((acc: any, [id, options]: [any, Action]) => {
+			if (options.type === type) {
+				return [...acc, { id, ...options }];
+			}
+
+			return acc;
+		}, []);
+	}
+
+	public modifyAction(id: number, options: Action) {
+		if (this.actions[id]) {
+			this.actions[id] = options;
+		}
+	}
+
+	public get getActions() {
+		return this.actions;
+	}
+
 	public toString(): string {
-		return this.indent(this.template);
+		Object.values(this.actions).forEach((action) => {
+			action.method(...action.args);
+		});
+
+		const template = this.template;
+
+		this.template = '';
+
+		return this.indent(template);
 	}
 }
 

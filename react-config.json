@@ -4,35 +4,20 @@
 		"typescript": true
 	},
 	"component": {
-		"directory": "components",
 		"style": true,
 		"story": false,
 		"test": false,
 		"proptypes": true,
 		"naming": "name",
-		"fileNamePostfix": ".component",
+		"fileNamePostfix": "",
 		"index": true,
 		"inFolder": true,
 		"casing": "kebab",
 		"open": true,
-		"path": "src/components"
-	},
-	"page": {
-		"directory": "pages",
-		"style": true,
-		"story": false,
-		"test": false,
-		"proptypes": true,
-		"naming": "name",
-		"fileNamePostfix": ".page",
-		"index": true,
-		"inFolder": true,
-		"casing": "kebab",
-		"open": true,
-		"path": "src/pages"
+		"directory": "components"
 	},
 	"style": {
 		"type": "styled-components",
-		"naming": "styles"
+		"naming": "componentName"
 	}
 }

@@ -8,24 +8,37 @@ import fs from 'fs';
 import path from 'path';
 
 // Utils
-import { conditionalString } from '../utils';
 import dependency from '../utils/dependency';
+import featureToggling from '../utils/feature-toggling';
 
 // Buidlers
-import JSTemplateBuilder from '../builders/js-template-builder';
+import JSTemplateBuilder, { ActionType } from '../builders/js-template-builder';
 
 // Services
 import styleService from './style';
-import featureTogglingService from '../services/feature-toggling';
+
+export enum Feature {
+	InFolder = 'inFolder',
+	Style = 'style',
+	PropTypes = 'proptypes',
+	Redux = 'redux',
+	TypeScript = 'typescript',
+	Index = 'index',
+	Test = 'test',
+	Story = 'story',
+	Open = 'open',
+}
 
 function _includeRedux(template: JSTemplateBuilder) {
+	const body = new JSTemplateBuilder().insertEmptyBody();
+
 	template
 		.insertFunction({
 			name: 'mapStateToProps',
 			args: ['state'],
 			arrow: true,
 			immidiateReturn: true,
-			content: '{\n\n};',
+			content: body,
 			insertOptions: {
 				newLine: { beforeCount: 1 },
 				insertBefore: 'export',
@@ -36,7 +49,7 @@ function _includeRedux(template: JSTemplateBuilder) {
 			args: ['dispatch'],
 			arrow: true,
 			immidiateReturn: true,
-			content: '{\n\n};',
+			content: body,
 			insertOptions: {
 				newLine: { beforeCount: 1 },
 				insertBefore: 'export',
@@ -46,50 +59,47 @@ function _includeRedux(template: JSTemplateBuilder) {
 		.wrapExport(`connect(mapStateToProps, mapDispatchToProps)`);
 }
 
-function _includeStyle(template: JSTemplateBuilder, name: string, config: StyleConfig) {
+function _includeStyle(
+	template: JSTemplateBuilder,
+	element: JSTemplateBuilder,
+	name: string,
+	config: StyleConfig
+) {
 	const fileNamePostfix = config.modules ? '.module' : '';
 	const fileName = (config.naming === 'componentName' ? name : config.naming) + fileNamePostfix;
-	const importPath = `./${fileName}.${styleService.getStylingType(config.type)}`;
+	const fileExtension = styleService.getStylingType(config.type);
+	const importPath = `./${fileName}.${fileExtension}`;
+	const insertElementAction = element.getActionsByType(ActionType.Element)?.[0];
 
-	if (config.type !== 'styled-components') {
-		const importName = conditionalString(config.modules, 'styles');
+	if (styleService.getStylingType(config.type) === 'css') {
+		const importName = config.modules ? 'styles' : '';
 
 		template.insertImportStatement(importName, importPath);
 
 		if (config.modules) {
-			const classStr = '<div className=';
-			const classIndex = template.toString().indexOf(classStr) + classStr.length + 1;
-			const classEndIndex =
-				classIndex +
-				template
-					.toString()
-					.substr(classIndex + 2)
-					.indexOf('"') +
-				2;
-			const className = template.toString().substr(classIndex, classEndIndex - classIndex);
-
-			template.override(
-				template.toString().substr(0, classIndex - 1) +
-					`{styles.${className}}` +
-					template.toString().substr(classEndIndex + 1)
-			);
+			if (insertElementAction) {
+				insertElementAction.args[0] = {
+					...insertElementAction.args[0],
+					tag: 'div',
+					props: {
+						...insertElementAction.args[0].props,
+						className: `{styles.${insertElementAction.args[0].props.className}}`,
+					},
+				};
+			}
 		}
 	} else {
-		const templateString = template.toString();
 		const elementName = `${casing.pascal(name)}Element`;
 
-		template
-			.override(
-				templateString.substr(0, templateString.indexOf('<div')) +
-					templateString.substr(templateString.lastIndexOf('>') + 1)
-			)
-			.insertElement({
+		if (insertElementAction) {
+			insertElementAction.args[0] = {
+				...insertElementAction.args[0],
 				tag: elementName,
-				insertOptions: {
-					insertAtIndex: templateString.indexOf('<div'),
-				},
-			})
-			.insertImportStatement(`{ ${elementName} }`, importPath);
+				props: {},
+			};
+		}
+
+		template.insertImportStatement(`{ ${elementName} }`, importPath);
 	}
 }
 
@@ -107,10 +117,10 @@ function _generateTemplate(
 	constraints: Constraints,
 	config: Config
 ) {
-	const feature = featureTogglingService.toggle('component', config, options, constraints);
+	const feature = featureToggling.toggle('component', config, options, constraints);
 	const template = new JSTemplateBuilder();
 	const element = new JSTemplateBuilder();
-	const reactVersion = +dependency.getVersion('react')?.replace(/\^|\./g, '') ?? 0;
+	const reactVersion = parseInt(dependency.getVersion('react')?.replace(/\^|\./g, ''));
 
 	if (!reactVersion || reactVersion < 701) {
 		template.insertImportStatement('React', 'react');
@@ -124,16 +134,16 @@ function _generateTemplate(
 	if (!options.class) {
 		let implementsInterface = null;
 
-		feature('typescript', () => {
-			const interfaceName = `${casing.pascal(name)}Props`;
+		feature(Feature.TypeScript, () => {
+			const interfaceName = casing.pascal(name) + 'Props';
 
-			implementsInterface =
-				config.project.typescript || options.typescript
-					? `React.SFC<${interfaceName}>`
-					: null;
+			implementsInterface = `React.SFC<${interfaceName}>`;
 
-			template.insertInterface(interfaceName, '', '', {
-				newLine: { afterCount: 1 },
+			template.insertInterface({
+				name: interfaceName,
+				insertOptions: {
+					newLine: { beforeCount: 1, afterCount: 1 },
+				},
 			});
 		});
 
@@ -142,21 +152,28 @@ function _generateTemplate(
 			arrow: true,
 			immidiateReturn: true,
 			interfaceName: implementsInterface,
-			content: element.toString(),
+			content: element,
 			insertOptions: { newLine: { beforeCount: 1 } },
 		});
 	} else {
 		let withTypescript = false;
 
-		feature('typescript', () => {
+		feature(Feature.TypeScript, () => {
 			withTypescript = true;
 
-			template.insertInterface('Props', '', '', {
-				newLine: { afterCount: 1 },
-			});
-			template.insertInterface('State', '', '', {
-				newLine: { beforeCount: 1, afterCount: 1 },
-			});
+			template
+				.insertInterface({
+					name: 'Props',
+					insertOptions: {
+						newLine: { beforeCount: 1, afterCount: 1 },
+					},
+				})
+				.insertInterface({
+					name: 'State',
+					insertOptions: {
+						newLine: { beforeCount: 1, afterCount: 1 },
+					},
+				});
 		});
 
 		template.insertClass({
@@ -165,7 +182,7 @@ function _generateTemplate(
 			methods: [
 				{
 					name: 'render',
-					content: element.toString(),
+					content: element,
 				},
 			],
 			extendsTypeArguments: withTypescript ? ['Props', 'State'] : undefined,
@@ -177,15 +194,15 @@ function _generateTemplate(
 		newLine: { beforeCount: 1 },
 	});
 
-	feature('style', () => {
-		_includeStyle(template, name, config.style);
+	feature(Feature.Style, () => {
+		_includeStyle(template, element, name, config.style);
 	});
 
-	feature('proptypes', () => {
+	feature(Feature.PropTypes, () => {
 		_includeProptypes(template, name);
 	});
 
-	feature('redux', () => {
+	feature(Feature.Redux, () => {
 		_includeRedux(template);
 	});
 

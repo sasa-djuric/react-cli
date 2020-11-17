@@ -14,14 +14,14 @@ import { Options, Constraints } from '../types/index';
 
 // Utils
 import { getProjectRoot, makeIndexFileExport } from '../utils';
+import featureToggling from '../utils/feature-toggling';
 
 // Services
 import styleService from '../services/style';
 import testService from '../services/test';
-import componentService from '../services/component';
+import componentService, { Feature as ComponentFeature } from '../services/component';
 import storyService from '../services/story';
 import configService from '../services/config';
-import featureTogglingService from '../services/feature-toggling';
 
 function _checkSubFolders(mainPath: string, subFolders: string[]) {
 	let lastPath = mainPath;
@@ -63,18 +63,6 @@ function _handlePath(pathForCheck: string) {
 	return Promise.reject(new PathError());
 }
 
-enum Feature {
-	InFolder = 'inFolder',
-	Style = 'style',
-	PropTypes = 'proptypes',
-	Redux = 'redux',
-	TypeScript = 'typescript',
-	Index = 'index',
-	Test = 'test',
-	Story = 'story',
-	Open = 'open',
-}
-
 async function create(name: string, options: Options, constraints: Constraints, type: string) {
 	const config = configService.get();
 	const componentTypeConfig = config[type];
@@ -95,7 +83,7 @@ async function create(name: string, options: Options, constraints: Constraints, 
 		componentPath,
 		name + (componentTypeConfig.fileNamePostfix || '') + fileExtension
 	);
-	const feature = featureTogglingService.toggle('component', config, options, constraints);
+	const feature = featureToggling.toggle('component', config, options, constraints);
 
 	try {
 		await _handlePath(path.resolve(componentPath, '../'));
@@ -105,17 +93,17 @@ async function create(name: string, options: Options, constraints: Constraints, 
 			subFolders
 		);
 
-		feature(Feature.InFolder, () => {
+		feature(ComponentFeature.InFolder, () => {
 			fs.mkdirSync(componentPath);
 		});
 
 		componentService.create(namePreferred, componentPath, options, constraints, config);
 
-		feature(Feature.Style, () => {
+		feature(ComponentFeature.Style, () => {
 			styleService.create(namePreferred, config.style, componentPath);
 		});
 
-		feature(Feature.Index, () => {
+		feature(ComponentFeature.Index, () => {
 			makeIndexFileExport(
 				componentPath,
 				namePascal,
@@ -124,14 +112,14 @@ async function create(name: string, options: Options, constraints: Constraints, 
 			);
 		});
 
-		feature(Feature.Test, () => {
+		feature(ComponentFeature.Test, () => {
 			testService.create(namePreferred, componentPath, {
 				...config.testing,
 				typescript: config.project.typescript,
 			});
 		});
 
-		feature(Feature.Story, () => {
+		feature(ComponentFeature.Story, () => {
 			storyService.create(
 				namePreferred,
 				{ typescript: config.project.typescript },
@@ -139,7 +127,7 @@ async function create(name: string, options: Options, constraints: Constraints, 
 			);
 		});
 
-		feature(Feature.Open, () => {
+		feature(ComponentFeature.Open, () => {
 			exec(filePath);
 		});
 	} catch (err) {

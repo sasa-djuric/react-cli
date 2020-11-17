@@ -11,30 +11,40 @@ import configService from '../services/config';
 import { scope } from '../types';
 
 function project(scope: scope) {
-	return inquirer.prompt([
-		{
-			type: 'confirm',
-			name: 'typescript',
-			message: 'Using typescript?',
-			when: () => scope === 'global',
-		},
-	]);
+	return inquirer
+		.prompt([
+			{
+				type: 'confirm',
+				name: 'path',
+				message: 'Project source path ./src ?',
+			},
+			{
+				type: 'input',
+				name: 'manualPath',
+				message: 'Input project source folder path',
+				when: (res) => !res.path,
+			},
+			{
+				type: 'confirm',
+				name: 'typescript',
+				message: 'Using typescript?',
+			},
+		])
+		.then((res) => {
+			if (res.path) {
+				res.path = './src';
+			} else {
+				res.path = res.manualPath;
+				delete res.manualPath;
+			}
+
+			return res;
+		});
 }
 
 function component(scope: scope) {
 	return inquirer
 		.prompt([
-			{
-				type: 'confirm',
-				name: 'defaultPath',
-				message: 'Component path src/components ?',
-			},
-			{
-				type: 'input',
-				name: 'path',
-				message: 'Component path',
-				when: (answers) => !answers.defaultPath,
-			},
 			{ type: 'confirm', name: 'style', message: 'Create style file?' },
 			{ type: 'confirm', name: 'story', message: 'Create story file?' },
 			{ type: 'confirm', name: 'test', message: 'Create test file?' },
@@ -64,7 +74,7 @@ function component(scope: scope) {
 			{
 				type: 'list',
 				name: 'casing',
-				message: 'Casing',
+				message: 'File nema casing',
 				choices: [
 					{ name: 'Kebab', value: 'kebab' },
 					{ name: 'Snake', value: 'snake' },
@@ -90,6 +100,8 @@ function component(scope: scope) {
 			) {
 				delete result.fileNamePostfix;
 			}
+
+			result.directory = 'components';
 
 			return result;
 		});
