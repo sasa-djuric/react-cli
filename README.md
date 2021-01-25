@@ -19,22 +19,22 @@ rct c c text-input
 ```
 
 ```sh
-react-cli c c container header
+reactcli c c container header
 ```
 
 ```sh
-npx react-cli c h useInput
+npx reactcli c h useInput
 ```
 
 ### Installation
 
 For NPM
 
-`npm install -g react-cli`
+`npm install -g reactcli`
 
 For Yarn
 
-`yarn global add -g react-cli`
+`yarn global add -g reactcli`
 
 ## Usage
 
