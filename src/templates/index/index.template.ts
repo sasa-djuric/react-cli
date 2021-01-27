@@ -1,23 +1,22 @@
 import TemplateBuilder from '../../builders/base-template.builder';
 import JSTemplateBuilder from '../../builders/js-template.builder';
+import { toImportPath } from '../../utils/path';
 import BaseTemplate from '../base.template';
 
 class IndexTemplate extends BaseTemplate {
-	constructor(private importName: string, private importPath: string) {
+	constructor(private importPath: string) {
 		super();
 	}
 
 	build(): TemplateBuilder {
 		const template = new JSTemplateBuilder();
-		const { importName, importPath } = this;
+		const { importPath } = this;
 
-		template
-			.insertImportStatement({
-				importName: importName,
-				filePath: importPath,
-			})
-			.insertNewLine()
-			.insertExportStatement({ defaultExport: true, exportName: importName });
+		template.insertExportStatement({
+			defaultExport: false,
+			exportName: '{ default }',
+			exportFrom: toImportPath(importPath),
+		});
 
 		return template;
 	}

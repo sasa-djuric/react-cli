@@ -4,7 +4,7 @@ import path from 'path';
 
 // Helpers
 import { merge } from '../../utils/object';
-import { handlePathCheck } from '../../utils/path';
+import { fixRelativePath, handlePathCheck } from '../../utils/path';
 
 // Configuration
 import { ProjectConfig, loadScopeConfiguration } from '../../configuration';
@@ -47,10 +47,7 @@ class CreateIndexAction extends BaseAction {
 			parsedInputFilePath.base
 		);
 
-		const template = new IndexTemplate(
-			inputs!.file.importName,
-			relativeImportPath
-		).build();
+		const template = new IndexTemplate(fixRelativePath(relativeImportPath)).build();
 
 		await handlePathCheck(path.parse(indexFilePath).dir);
 

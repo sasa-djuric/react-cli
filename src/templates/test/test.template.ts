@@ -2,6 +2,7 @@ import JSTemplateBuilder from '../../builders/js-template.builder';
 import { TestConfig } from '../../configuration';
 import BaseTemplate from '../base.template';
 import casing from 'case';
+import { toImportPath } from '../../utils/path';
 
 class TestTemplate extends BaseTemplate {
 	constructor(
@@ -19,9 +20,9 @@ class TestTemplate extends BaseTemplate {
 		template
 			.insertImportStatement({
 				importName: pascalComponentName,
-				filePath: this.importPath,
+				filePath: toImportPath(this.importPath),
 			})
-			.insertNewLine(2)
+			.insertNewLine(1)
 			.insertFunctionCall({
 				name: 'describe',
 				args: [

@@ -4,7 +4,7 @@ import path from 'path';
 
 // Helpers
 import FilePath from '../../file-path';
-import { handlePathCheck } from '../../utils/path';
+import { handlePathCheck, fixRelativePath } from '../../utils/path';
 import { merge } from '../../utils/object';
 
 // Configuration
@@ -39,22 +39,22 @@ class CreateTestAction extends BaseAction {
 		const filePath = new FilePath({
 			name: inputs!.name || inputs!.componentName,
 			config: config,
-			relativeToFilePath: inputs!.filePath,
+			relativeToFilePath: path.parse(inputs!.filePath).dir,
 			nameTypes: Object.assign({}, inputs!.nameTypes, { '{type}': 'test' }),
-			pathTypes: { '{componentPath}': inputs!.filePath },
+			pathTypes: { '{componentPath}': path.parse(inputs!.filePath).dir },
 			postfixTypes: inputs!.postfixTypes,
 			sourcePath: getSourcePath(),
 			fileExtension: config.typescript ? 'ts' : 'js',
 		});
 
 		const relativeImportPath = path.join(
-			path.relative(path.dirname(filePath.dir), path.dirname(inputs!.filePath)),
-			inputs!.componentName
+			path.relative(filePath.dir, path.parse(inputs!.filePath).dir),
+			path.basename(inputs!.filePath)
 		);
 
 		const template = new TestTemplate(
 			inputs!.componentName,
-			relativeImportPath,
+			fixRelativePath(relativeImportPath),
 			config
 		).build();
 

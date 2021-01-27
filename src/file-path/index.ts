@@ -5,6 +5,7 @@ import casing from 'case';
 // Types
 import { BaseConfig } from '../configuration';
 import Dictionary from '../types/dictionary';
+import { fixRelativePath } from '../utils/path';
 
 interface FilePathConstructor {
 	name?: string;
@@ -134,7 +135,7 @@ class FilePath {
 		const relative = path.relative(dir, this.data.relativeToFilePath);
 		const fullRelative = path.join(relative, base);
 
-		return fullRelative;
+		return fixRelativePath(fullRelative);
 	}
 
 	private parseName(name: string) {

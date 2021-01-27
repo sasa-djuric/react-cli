@@ -4,6 +4,7 @@ import { BaseStyleTypeTemplateI } from './base.style.type.template';
 import JSTemplateBuilder, {
 	JSBuilderActionType,
 } from '../../builders/js-template.builder';
+import { toImportPath } from '../../utils/path';
 
 class StyleTemplate extends BaseTemplate {
 	constructor(
@@ -46,7 +47,7 @@ class StyleTemplate extends BaseTemplate {
 		new StyleTypeTemplate(name, config).include(
 			template,
 			name,
-			filePath,
+			toImportPath(filePath),
 			elementAction
 		);
 	}

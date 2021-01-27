@@ -38,7 +38,7 @@ export const defaultConfiguration: any = {
 	storybook: {
 		path: '{componentPath}',
 		fileNaming: {
-			postfix: 'story',
+			postfix: 'stories',
 		},
 	},
 	test: {

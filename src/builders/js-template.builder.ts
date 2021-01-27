@@ -54,6 +54,7 @@ interface insertExportStatement {
 	exportName: string;
 	defaultExport: boolean;
 	wrapExport?: string;
+	exportFrom?: string;
 	insertOptions?: InsertOptions;
 }
 
@@ -122,11 +123,12 @@ class JSTemplateBuilder extends TemplateBuilder {
 		exportName,
 		defaultExport,
 		wrapExport,
+		exportFrom,
 		insertOptions,
 	}: insertExportStatement) {
 		const statement = `export ${defaultExport ? 'default ' : ''}${
 			wrapExport ? `(${exportName})` : exportName
-		};`;
+		} ${exportFrom ? `'${exportFrom}'` : ''};`;
 
 		return this._insert(statement, insertOptions);
 	}

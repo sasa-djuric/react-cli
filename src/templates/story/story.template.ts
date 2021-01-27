@@ -3,6 +3,7 @@ import JSTemplateBuilder from '../../builders/js-template.builder';
 import { StorybookConfig } from '../../configuration';
 import BaseTemplate from '../base.template';
 import casing from 'case';
+import { toImportPath } from '../../utils/path';
 
 class StoryBookTemplate extends BaseTemplate {
 	constructor(
@@ -28,7 +29,7 @@ class StoryBookTemplate extends BaseTemplate {
 			.insertImportStatement({ importName: 'React', filePath: 'react' })
 			.insertImportStatement({
 				importName: pascalComponentName,
-				filePath: this.importPath,
+				filePath: toImportPath(this.importPath),
 			})
 			.insertNewLine()
 			.insertExportStatement({

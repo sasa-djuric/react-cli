@@ -110,7 +110,7 @@ class CreateComponentAction extends BaseAction {
 			const indexInputs: IndexInputs = {
 				file: {
 					importName: casing.pascal(path.namePreferred),
-					path: removeExtension(path.full),
+					path: path.full,
 				},
 			};
 
@@ -119,7 +119,7 @@ class CreateComponentAction extends BaseAction {
 
 		if (config.story) {
 			const storyInputs: StorybookInputs = {
-				filePath: path.dir,
+				filePath: path.full,
 				componentName: path.namePreferred,
 				nameTypes: { '{name}': path.namePreferred },
 				configOverride: config.override?.storybook,
@@ -130,7 +130,7 @@ class CreateComponentAction extends BaseAction {
 
 		if (config.test) {
 			const testInputs: TestInputs = {
-				filePath: path.dir,
+				filePath: path.full,
 				componentName: path.namePreferred,
 				nameTypes: { '{name}': path.namePreferred },
 				configOverride: config.override?.test,

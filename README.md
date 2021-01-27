@@ -15,7 +15,7 @@ react create component button
 ```
 
 ```sh
-rct c c text-input
+rct c c list/item
 ```
 
 ```sh

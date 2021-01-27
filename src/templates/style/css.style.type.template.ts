@@ -3,6 +3,7 @@ import CSSTemplateBuilder from '../../builders/css-template.builder';
 import { cssStyleType } from '../../configuration';
 import casing from 'case';
 import JSTemplateBuilder from '../../builders/js-template.builder';
+import { toImportPath } from '../../utils/path';
 
 class CSSStyleTypeTemplate extends BaseStyleTypeTemplate {
 	build() {
@@ -21,7 +22,10 @@ class CSSStyleTypeTemplate extends BaseStyleTypeTemplate {
 	) {
 		const importName = this.config.modules ? 'styles' : '';
 
-		template.insertImportStatement({ importName, filePath: importPath });
+		template.insertImportStatement({
+			importName,
+			filePath: toImportPath(importPath),
+		});
 
 		if (elementAction) {
 			elementAction.tag = 'div';

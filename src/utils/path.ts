@@ -86,3 +86,15 @@ export function removeExtension(str: string) {
 	const index = str.lastIndexOf('.');
 	return index >= 0 ? str.substr(0, index) : str;
 }
+
+export function fixRelativePath(realtivePath: string) {
+	const pathSeparator = path.sep;
+
+	return !(realtivePath.startsWith('.') || realtivePath.startsWith(pathSeparator))
+		? `.${pathSeparator}${realtivePath}`
+		: realtivePath;
+}
+
+export function toImportPath(pathStr: string) {
+	return pathStr.replace(/\\/g, '/');
+}
