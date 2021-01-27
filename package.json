@@ -32,7 +32,8 @@
 		"hook",
 		"redux",
 		"story-book",
-		"preact"
+		"preact",
+		"typescript"
 	],
 	"bugs": {
 		"url": "https://github.com/sasa-djuric/react-cli/issues"

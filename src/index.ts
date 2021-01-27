@@ -18,7 +18,6 @@ import CreateHookAction from './actions/create/hook.action';
 // Commands
 import Commands from './commands';
 import InitCommand from './commands/init.command';
-import CreateCommand from './commands/create';
 import CreateComponentCommand from './commands/create/component.command';
 import CreateHookCommand from './commands/create/hook.command';
 
@@ -45,11 +44,8 @@ function onException(ex: Error) {
 
 	program.version('1.0.0').description('React CLI');
 	commands.add(new InitCommand(new InitAction()));
-	commands
-		.add(new CreateCommand())
-		.addSubCommand(new CreateComponentCommand(new CreateComponentAction()))
-		.addSubCommand(new CreateHookCommand(new CreateHookAction()));
-
+	commands.add(new CreateComponentCommand(new CreateComponentAction()));
+	commands.add(new CreateHookCommand(new CreateHookAction()));
 	commands.load(program);
 	program.parse(process.argv);
 })();
