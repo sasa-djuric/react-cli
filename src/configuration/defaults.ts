@@ -49,5 +49,8 @@ export const defaultConfiguration: any = {
 	},
 	hook: {
 		path: '/hooks',
+		fileNaming: {
+			casing: 'camel',
+		},
 	},
 };

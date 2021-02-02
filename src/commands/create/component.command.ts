@@ -9,8 +9,9 @@ import BaseCommand from '../base.command';
 
 class CreateComponentCommand extends BaseCommand {
 	build() {
-		return new Command('component [type] <name>')
+		return new Command('component')
 			.alias('c')
+			.arguments('[type] [name]')
 			.description('create component')
 			.option('-s, --style', 'Create a style file')
 			.option('-t, --typescript', 'Use typescript')
@@ -35,25 +36,35 @@ class CreateComponentCommand extends BaseCommand {
 			.option('-notp, --no-typescript', "Don't use typescript")
 			.option('-nor, --no-redux', "Don't include redux")
 			.option('--no-story', "Don't create story book file")
-			.action(async (params: any, args: Array<string>) => {
-				const inputs: { type: string; name: string } = {
-					type: 'default',
-					name: args[0],
-				};
+			.action(
+				async (
+					type: string | undefined,
+					name: string | undefined,
+					params: any
+				) => {
+					const inputs = {
+						type: 'default',
+						name: type,
+					};
 
-				if (args.length >= 2) {
-					inputs.type = args[0];
-					inputs.name = args[1];
+					if (type && name) {
+						inputs.type = type;
+						inputs.name = name;
+					}
+
+					if (!type && !name) {
+						throw new Error('Name argument is missing');
+					}
+
+					if (!this.validateType(inputs.type)) {
+						throw new Error('Wrong component type');
+					}
+
+					const options = this.parseOptions(params);
+
+					this.action.handle(inputs, options);
 				}
-
-				const options = this.parseOptions(params);
-
-				if (!this.validateType(inputs.type)) {
-					return console.error('Wrong component type');
-				}
-
-				this.action.handle(inputs, options);
-			}) as Command;
+			) as Command;
 	}
 
 	private validateType(type: string): boolean {

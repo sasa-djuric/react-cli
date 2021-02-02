@@ -31,8 +31,13 @@ interface Options {
 class CreateHookAction extends BaseAction {
 	async handle(inputs?: Inputs, options?: Options) {
 		const config = merge(options, loadScopeConfiguration('hook')) as HookConfig;
+
+		const name = !inputs!.name.startsWith('use')
+			? `use-${inputs!.name}`
+			: inputs!.name;
+
 		const filePath = new FilePath({
-			name: inputs!.name,
+			name,
 			fileExtension: config.typescript ? 'ts' : 'js',
 			sourcePath: getSourcePath(),
 			postfixTypes: { type: 'hook' },
@@ -46,7 +51,7 @@ class CreateHookAction extends BaseAction {
 			this.createFolder(filePath.dir);
 		}
 
-		const template = new HookTemplate(inputs!.name, config.typescript).build();
+		const template = new HookTemplate(name, config.typescript).build();
 
 		fs.writeFileSync(filePath.full, template.toString(), { encoding: 'utf8' });
 
