@@ -11,7 +11,7 @@ The motivation for creating this project was to reduce the time spent on creatin
 #### Examples
 
 ```sh
-npx c-react-cli component button
+npx cr-react-cli component button
 ```
 
 ```sh
@@ -30,11 +30,11 @@ rct h useInput
 
 For NPM
 
-`npm install -g c-react-cli`
+`npm install -g cr-react-cli`
 
 For Yarn
 
-`yarn global add -g c-react-cli`
+`yarn global add -g cr-react-cli`
 
 ## Usage
 
