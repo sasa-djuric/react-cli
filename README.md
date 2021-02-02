@@ -6,24 +6,24 @@ Create react files with a single command
 
 ### Motivation
 
-The motivation for this project was to reduce the time spent on creating files and boilerplate code and be more productive.
+The motivation for creating this project was to reduce the time spent on creating files and boilerplate code and be more productive.
 
 #### Examples
 
 ```sh
-react create component button
+npx c-react-cli component button
 ```
 
 ```sh
-rct c c list/item
+react-cli c list/item
 ```
 
 ```sh
-reactcli c c container header
+react c container header
 ```
 
 ```sh
-npx reactcli c h useInput
+rct h useInput
 ```
 
 ### Installation
@@ -41,9 +41,9 @@ For Yarn
 ### <code><strong>react init</strong></code>
 
 Generates a [configuration file](#configuration) based on the prompt.
-Configuration can on global or project scope.
+Configuration can be on global or project scope.
 
-### <code><strong>react create component</strong></code>
+### <code><strong>react component</strong></code>
 
 Arguments
 
@@ -76,7 +76,7 @@ Options
 | --no-test                          | -not               | Don't create a test file                                                                                     |
 | --no-index                         | -noi               | Don't create an index file                                                                                   |
 
-### <code><strong>react create hook</strong></code>
+### <code><strong>react hook</strong></code>
 
 Arguments
 
@@ -144,14 +144,14 @@ The configuration file contains the next scopes (fields):
 
 ### <code>StyleConfig</code>
 
-| Option     | Type                                                          | Description                                                                                                  |
-| ---------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| type       | <code>css \| scss \| sass \| less \| styled-components</code> | Type of styling technology                                                                                   |
-| modules    | <code>boolean</code>                                          | Use css modules                                                                                              |
-| path       | <code>string</code>                                           | Specify the path for the file relative to the project source path defined in the project configuration entry |
-| typescript | <code>boolean</code>                                          | Use typescript (for css in js solutions)                                                                     |
-| inFolder   | <code>boolean</code>                                          | Save the file in its own folder                                                                              |
-| fileNaming | <code>[FileNaming](#filenaming)</code>                        | Define file naming                                                                                           |
+| Option     | Type                                                                                                              | Description                                                                                                  |
+| ---------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| type       | <code>css</code> \| <code>scss</code> \| <code>sass</code> \| <code>less</code> \| <code>styled-components</code> | Type of styling technology                                                                                   |
+| modules    | <code>boolean</code>                                                                                              | Use css modules                                                                                              |
+| path       | <code>string</code>                                                                                               | Specify the path for the file relative to the project source path defined in the project configuration entry |
+| typescript | <code>boolean</code>                                                                                              | Use typescript (for css in js solutions)                                                                     |
+| inFolder   | <code>boolean</code>                                                                                              | Save the file in its own folder                                                                              |
+| fileNaming | <code>[FileNaming](#filenaming)</code>                                                                            | Define file naming                                                                                           |
 
 ### <code>StorybookConfig</code>
 
@@ -185,12 +185,12 @@ The configuration file contains the next scopes (fields):
 
 #### <code>FileNaming</code>
 
-| Option         | Type                                           | Description                                                   |
-| -------------- | ---------------------------------------------- | ------------------------------------------------------------- |
-| name           | <code>string</code>                            | Specify name or naming type                                   |
-| postfix        | <code>string</code>                            | Define postfix or [postfix type](#postfix-type) for file name |
-| postfixDevider | <code>string</code>                            | Define postfix devider                                        |
-| casing         | <code>camel \| pascal \| kebab \| snake</code> | Specify casing type                                           |
+| Option         | Type                                                                                  | Description                                                   |
+| -------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| name           | <code>string</code>                                                                   | Specify name or naming type                                   |
+| postfix        | <code>string</code>                                                                   | Define postfix or [postfix type](#postfix-type) for file name |
+| postfixDevider | <code>string</code>                                                                   | Define postfix devider                                        |
+| casing         | <code>camel</code> \| <code>pascal</code> \| <code>kebab</code> \| <code>snake</code> | Specify casing type                                           |
 
 #### Name types
 

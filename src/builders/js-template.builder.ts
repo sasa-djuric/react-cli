@@ -128,7 +128,7 @@ class JSTemplateBuilder extends TemplateBuilder {
 	}: insertExportStatement) {
 		const statement = `export ${defaultExport ? 'default ' : ''}${
 			wrapExport ? `(${exportName})` : exportName
-		} ${exportFrom ? `'${exportFrom}'` : ''};`;
+		} ${exportFrom ? `from '${exportFrom}'` : ''};`;
 
 		return this._insert(statement, insertOptions);
 	}
