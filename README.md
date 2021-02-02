@@ -30,11 +30,11 @@ rct h useInput
 
 For NPM
 
-`npm install -g reactcli`
+`npm install -g c-react-cli`
 
 For Yarn
 
-`yarn global add -g reactcli`
+`yarn global add -g c-react-cli`
 
 ## Usage
 
