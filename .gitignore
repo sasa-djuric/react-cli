@@ -1,0 +1,7 @@
+node_modules
+/lib
+package-lock.json
+notes.txt
+react.config.json
+src/components
+src/hooks
