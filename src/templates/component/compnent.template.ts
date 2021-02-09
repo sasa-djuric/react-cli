@@ -30,7 +30,7 @@ class ComponentTemplate extends BaseTemplate {
 		const reactVersion = getDependencyVersion('react');
 		const isReactNative = doesDependencyExists('react-native');
 
-		if (!reactVersion || reactVersion < 17.01) {
+		if (config.class || !reactVersion || reactVersion < 17.01) {
 			template.insertImportStatement({ importName: 'React', filePath: 'react' });
 		}
 
