@@ -10,7 +10,7 @@ class JSStyleTypeTemplate extends BaseStyleTypeTemplate {
 
 		template
 			.insertImportStatement({
-				importName: '{ styled }',
+				importName: 'styled',
 				filePath: 'styled-components',
 			})
 			.insertNewLine()
