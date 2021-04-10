@@ -305,4 +305,4 @@ The configuration file contains the next scopes (fields):
 
 ## License
 
-[MIT](https://github.com/djsasa/react-cli/blob/master/LICENSE)
+[MIT](https://github.com/sasa-djuric/react-cli/blob/master/LICENSE)
