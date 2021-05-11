@@ -4,7 +4,7 @@ import path from 'path';
 
 // Helpers
 import { merge } from '../../utils/object';
-import { fixRelativePath, handlePathCheck } from '../../utils/path';
+import { fixRelativePath, handlePathCheck, removeExtension } from '../../utils/path';
 
 // Configuration
 import { ProjectConfig, loadScopeConfiguration } from '../../configuration';
@@ -42,9 +42,11 @@ class CreateIndexAction extends BaseAction {
 			`index.${indexFileExtension}`
 		);
 
-		const relativeImportPath = path.join(
-			path.relative(parsedInputFilePath.dir, parsedInputFilePath.dir),
-			parsedInputFilePath.base
+		const relativeImportPath = removeExtension(
+			path.join(
+				path.relative(parsedInputFilePath.dir, parsedInputFilePath.dir),
+				parsedInputFilePath.base
+			)
 		);
 
 		const template = new IndexTemplate(fixRelativePath(relativeImportPath)).build();
