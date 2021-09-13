@@ -21,7 +21,7 @@ export function createConfigurationFile(config: any, scope: 'global' | 'project'
 		fs.writeFileSync(filePath, JSON.stringify(mergedConfig, null, '\t'), {
 			encoding: 'utf-8',
 		});
-	} catch (ex) {
+	} catch (ex: any) {
 		console.error(ex.message);
 	}
 }
