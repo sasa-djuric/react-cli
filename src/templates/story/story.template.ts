@@ -4,6 +4,7 @@ import { StorybookConfig } from '../../configuration';
 import BaseTemplate from '../base.template';
 import casing from 'case';
 import { toImportPath } from '../../utils/path';
+import { getDependencyVersion } from '../../utils/dependency';
 
 class StoryBookTemplate extends BaseTemplate {
 	constructor(
@@ -18,6 +19,7 @@ class StoryBookTemplate extends BaseTemplate {
 		const template = new JSTemplateBuilder();
 		const templateComponent = new JSTemplateBuilder();
 		const pascalComponentName = casing.pascal(this.componentName);
+		const reactVersion = getDependencyVersion('react');
 
 		templateComponent.insertElement({
 			tag: pascalComponentName,
@@ -25,15 +27,31 @@ class StoryBookTemplate extends BaseTemplate {
 			selfClosing: true,
 		});
 
+		if (!reactVersion || reactVersion < 17.01) {
+			template.insertImportStatement({ importName: 'React', filePath: 'react' });
+		}
+
+		let storyDefinition = `{\n    title: 'Components/${pascalComponentName}',\n    component: ${pascalComponentName}\n}`;
+		let templateInterface = ``;
+
+		if (this.config.typescript) {
+			storyDefinition = `${storyDefinition} as Meta`;
+			templateInterface = `Story`;
+
+			template.insertImportStatement({
+				filePath: '@storybook/react',
+				importName: `{ Meta, Story }`,
+			});
+		}
+
 		template
-			.insertImportStatement({ importName: 'React', filePath: 'react' })
 			.insertImportStatement({
 				importName: pascalComponentName,
 				filePath: toImportPath(this.importPath),
 			})
 			.insertNewLine()
 			.insertExportStatement({
-				exportName: `{\n    title: 'Components/${pascalComponentName}',\n    component: ${pascalComponentName}\n}`,
+				exportName: storyDefinition,
 				defaultExport: true,
 			})
 			.insertNewLine(2)
@@ -43,6 +61,7 @@ class StoryBookTemplate extends BaseTemplate {
 				arrow: true,
 				content: templateComponent,
 				body: false,
+				interfaceName: templateInterface,
 			})
 			.insertNewLine()
 			.insertExportStatement({
