@@ -4,7 +4,7 @@ import path from 'path';
 
 // Helpers
 import FilePath from '../../file-path';
-import { handlePathCheck, fixRelativePath } from '../../utils/path';
+import { handlePathCheck, fixRelativePath, removeExtension } from '../../utils/path';
 import { merge } from '../../utils/object';
 
 // Configuration
@@ -47,9 +47,11 @@ class CreateTestAction extends BaseAction {
 			fileExtension: config.typescript ? 'ts' : 'js',
 		});
 
-		const relativeImportPath = path.join(
-			path.relative(filePath.dir, path.parse(inputs!.filePath).dir),
-			path.basename(inputs!.filePath)
+		const relativeImportPath = removeExtension(
+			path.join(
+				path.relative(filePath.dir, path.parse(inputs!.filePath).dir),
+				path.basename(inputs!.filePath)
+			)
 		);
 
 		const template = new TestTemplate(

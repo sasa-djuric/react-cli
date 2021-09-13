@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 // Helpers
-import { fixRelativePath, handlePathCheck } from '../../utils/path';
+import { fixRelativePath, handlePathCheck, removeExtension } from '../../utils/path';
 import { merge } from '../../utils/object';
 import FilePath from '../../file-path';
 
@@ -48,12 +48,14 @@ class CreateStoryAction extends BaseAction {
 			pathTypes: { '{componentPath}': path.parse(inputs!.filePath).dir },
 			postfixTypes: inputs!.postfixTypes,
 			sourcePath: getSourcePath(),
-			fileExtension: config.typescript ? 'ts' : 'js',
+			fileExtension: config.typescript ? 'tsx' : 'jsx',
 		});
 
-		const relativeImportPath = path.join(
-			path.relative(filePath.dir, path.parse(inputs!.filePath).dir),
-			path.parse(inputs!.filePath).base
+		const relativeImportPath = removeExtension(
+			path.join(
+				path.relative(filePath.dir, path.parse(inputs!.filePath).dir),
+				path.parse(inputs!.filePath).base
+			)
 		);
 
 		const template = new StorybookTemplate(
