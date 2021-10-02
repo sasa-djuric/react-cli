@@ -21,6 +21,7 @@ interface InsertClass {
 	}>;
 	extendsTypeArguments?: Array<any>;
 	insertOptions?: InsertOptions;
+	export?: boolean;
 }
 
 interface InsertFunction {
@@ -34,6 +35,7 @@ interface InsertFunction {
 	interfaceName?: string | null;
 	content?: JSTemplateBuilder;
 	insertOptions?: InsertOptions;
+	export?: boolean;
 }
 
 interface InsertInterface {
@@ -152,13 +154,15 @@ class JSTemplateBuilder extends TemplateBuilder {
 		interfaceName,
 		content,
 		insertOptions,
+		export: exportProp,
 	}: InsertFunction) {
+		const exportStr = exportProp ? 'export ' : '';
 		const asyncStr = async ? 'async ' : '';
 		const interfaceArrow = interfaceName ? ': ' + interfaceName : '';
 		const interfaceFunction = interfaceName ? `<${interfaceName}>` : '';
 		const declaration = !arrow
-			? `${asyncStr}function ${interfaceFunction}${name}`
-			: `const ${name}${interfaceArrow} = ${asyncStr}`;
+			? `${exportStr}${asyncStr}function ${interfaceFunction}${name}`
+			: `${exportStr}const ${name}${interfaceArrow} = ${asyncStr}`;
 		const contentBody = body
 			? `{\n${body && immidiateReturn ? 'return ' : ''}${
 					content?.toString() ?? ''
@@ -185,7 +189,9 @@ class JSTemplateBuilder extends TemplateBuilder {
 		methods,
 		extendsTypeArguments,
 		insertOptions,
+		export: exportProp,
 	}: InsertClass) {
+		const exportStr = exportProp ? 'export ' : '';
 		const packedMethods = methods.reduce((acc, cur, index) => {
 			const packedArgs = cur.args?.join(', ') ?? '';
 			const isLast = methods.length - 1 === index;
@@ -194,7 +200,7 @@ class JSTemplateBuilder extends TemplateBuilder {
 				cur.immidiateReturn ? 'return ' : ''
 			}${cur.content.toString() || ''}\n}${!isLast ? '\n\n' : ''}`;
 		}, '');
-		const template = `class ${name}${
+		const template = `${exportStr}class ${name}${
 			extendsName
 				? ` extends ${extendsName}${
 						extendsTypeArguments

@@ -19,6 +19,7 @@ export const defaultConfiguration: any = {
 			redux: false,
 			index: false,
 			testId: false,
+			defaultExport: true,
 			inFolder: true,
 			open: false,
 			path: '/components',

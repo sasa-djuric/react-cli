@@ -38,6 +38,7 @@ class ClassComponentTemplate extends BaseComponentTypeTemplate {
 				extendsTypeArguments: this.typescript
 					? [propsInterfaceName /*, stateInterfaceName*/]
 					: undefined,
+				export: !this.defaultExport,
 			})
 			.insertNewLine();
 	}

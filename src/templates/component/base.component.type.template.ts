@@ -6,7 +6,8 @@ export interface BaseComponentTypeTemplateI {
 		template: JSTemplateBuilder,
 		element: JSTemplateBuilder,
 		name: string,
-		typescript: boolean
+		typescript: boolean,
+		defaultExport: boolean
 	): BaseComponentTypeTemplate;
 	build(): void;
 }
@@ -16,7 +17,8 @@ abstract class BaseComponentTypeTemplate {
 		protected template: JSTemplateBuilder,
 		protected element: JSTemplateBuilder,
 		protected name: string,
-		protected typescript: boolean
+		protected typescript: boolean,
+		protected defaultExport: boolean
 	) {}
 
 	abstract build(): void;

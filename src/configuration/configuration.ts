@@ -35,6 +35,7 @@ export interface ComponentConfig extends BaseConfig {
 	index: boolean;
 	open: boolean;
 	testId: boolean;
+	defaultExport: boolean;
 	override?: {
 		style?: StyleConfig;
 		storybook?: StorybookConfig;

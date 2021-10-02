@@ -34,14 +34,22 @@ class ComponentTemplate extends BaseTemplate {
 			template.insertImportStatement({ importName: 'React', filePath: 'react' });
 		}
 
-		new ComponentTypeTemplate(template, element, name, config.typescript!).build();
+		new ComponentTypeTemplate(
+			template,
+			element,
+			name,
+			config.typescript!,
+			config.defaultExport
+		).build();
 
 		this.includeElement(template, element, isReactNative);
 
-		template.insertNewLine().insertExportStatement({
-			exportName: casing.pascal(name),
-			defaultExport: true,
-		});
+		if (config.defaultExport) {
+			template.insertNewLine().insertExportStatement({
+				exportName: casing.pascal(name),
+				defaultExport: true,
+			});
+		}
 
 		return template;
 	}

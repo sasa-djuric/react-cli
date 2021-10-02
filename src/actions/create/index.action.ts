@@ -24,6 +24,7 @@ export interface IndexInputs {
 		path: string;
 	};
 	configOverride?: Dictionary<any>;
+	export: 'default' | 'all' | string;
 }
 
 class CreateIndexAction extends BaseAction {
@@ -49,7 +50,10 @@ class CreateIndexAction extends BaseAction {
 			)
 		);
 
-		const template = new IndexTemplate(fixRelativePath(relativeImportPath)).build();
+		const template = new IndexTemplate(
+			fixRelativePath(relativeImportPath),
+			inputs?.export!
+		).build();
 
 		await handlePathCheck(path.parse(indexFilePath).dir);
 

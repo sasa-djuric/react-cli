@@ -112,6 +112,7 @@ class CreateComponentAction extends BaseAction {
 					importName: casing.pascal(path.namePreferred),
 					path: path.full,
 				},
+				export: config.defaultExport ? 'default' : 'all',
 			};
 
 			await new CreateIndexAction().handle(indexInputs);

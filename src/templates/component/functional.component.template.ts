@@ -28,6 +28,7 @@ class FunctionalComponentTemplate extends BaseComponentTypeTemplate {
 			immidiateReturn: true,
 			interfaceName: implementsInterface,
 			content: this.element,
+			export: !this.defaultExport,
 		});
 	}
 }

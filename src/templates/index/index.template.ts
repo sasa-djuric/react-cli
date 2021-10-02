@@ -4,17 +4,26 @@ import { toImportPath } from '../../utils/path';
 import BaseTemplate from '../base.template';
 
 class IndexTemplate extends BaseTemplate {
-	constructor(private importPath: string) {
+	constructor(
+		private importPath: string,
+		private exportProp: 'default' | 'all' | string
+	) {
 		super();
 	}
 
 	build(): TemplateBuilder {
 		const template = new JSTemplateBuilder();
 		const { importPath } = this;
+		const exportName =
+			this.exportProp === 'default'
+				? '{ default }'
+				: this.exportProp === 'all'
+				? '*'
+				: this.exportProp;
 
 		template.insertExportStatement({
 			defaultExport: false,
-			exportName: '{ default }',
+			exportName: exportName,
 			exportFrom: toImportPath(importPath),
 		});
 
