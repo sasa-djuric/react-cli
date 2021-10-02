@@ -254,6 +254,7 @@ The configuration file contains the next scopes (fields):
             "test": true,
             "proptypes": true,
             "index": true,
+            "defaultExport": true,
             "inFolder": true,
             "open": true,
             "fileNaming": {
