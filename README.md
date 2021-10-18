@@ -11,7 +11,7 @@ The motivation for creating this project was to reduce the time spent on creatin
 #### Examples
 
 ```sh
-npx cr-react-cli component button
+npx react component button
 ```
 
 ```sh
