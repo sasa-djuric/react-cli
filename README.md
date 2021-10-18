@@ -15,15 +15,11 @@ npx cr-react-cli component button
 ```
 
 ```sh
-react-cli c list/item
+npx react c container header
 ```
 
 ```sh
-react c container header
-```
-
-```sh
-rct h useInput
+npx react hook useInput
 ```
 
 ### Installation
