@@ -22,6 +22,7 @@ import BaseAction from '../base.action';
 export interface TestInputs {
 	name?: string;
 	componentName: string;
+	componentDefaultImport: boolean;
 	filePath: string;
 	nameTypes?: Dictionary<string>;
 	postfixTypes?: Dictionary<string>;
@@ -29,7 +30,7 @@ export interface TestInputs {
 }
 
 class CreateTestAction extends BaseAction {
-	async handle(inputs?: TestInputs, options?: Dictionary<any>) {
+	async handle(inputs: TestInputs, options?: Dictionary<any>) {
 		const config = merge(
 			options,
 			inputs?.configOverride,
@@ -57,7 +58,8 @@ class CreateTestAction extends BaseAction {
 		const template = new TestTemplate(
 			inputs!.componentName,
 			fixRelativePath(relativeImportPath),
-			config
+			config,
+			inputs.componentDefaultImport
 		).build();
 
 		await handlePathCheck(filePath.dir);

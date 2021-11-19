@@ -37,7 +37,8 @@ class JSStyleTypeTemplate extends BaseStyleTypeTemplate {
 		}
 
 		template.insertImportStatement({
-			importName: `{ ${elementName} }`,
+			importName: `${elementName}`,
+			type: 'destructure',
 			filePath: removeExtension(importPath),
 		});
 	}

@@ -20,10 +20,9 @@ class CSSStyleTypeTemplate extends BaseStyleTypeTemplate {
 		importPath: string,
 		elementAction: any
 	) {
-		const importName = this.config.modules ? 'styles' : '';
-
 		template.insertImportStatement({
-			importName,
+			importName: 'styles',
+			type: this.config.modules ? 'default' : 'none-named',
 			filePath: toImportPath(importPath),
 		});
 

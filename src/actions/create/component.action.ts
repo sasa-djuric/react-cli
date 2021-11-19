@@ -12,7 +12,7 @@ import CreateTestAction, { TestInputs } from './test.action';
 // Helpers
 import FilePath from '../../file-path';
 import { merge } from '../../utils/object';
-import { handleFileCheck, handlePathCheck, removeExtension } from '../../utils/path';
+import { handleFileCheck, handlePathCheck } from '../../utils/path';
 
 // Configuration
 import {
@@ -122,6 +122,7 @@ class CreateComponentAction extends BaseAction {
 			const storyInputs: StorybookInputs = {
 				filePath: path.full,
 				componentName: path.namePreferred,
+				componentDefaultImport: config.defaultExport,
 				nameTypes: { '{name}': path.namePreferred },
 				configOverride: config.override?.storybook,
 			};
@@ -133,6 +134,7 @@ class CreateComponentAction extends BaseAction {
 			const testInputs: TestInputs = {
 				filePath: path.full,
 				componentName: path.namePreferred,
+				componentDefaultImport: config.defaultExport,
 				nameTypes: { '{name}': path.namePreferred },
 				configOverride: config.override?.test,
 			};

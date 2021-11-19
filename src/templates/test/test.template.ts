@@ -8,7 +8,8 @@ class TestTemplate extends BaseTemplate {
 	constructor(
 		private componentName: string,
 		private importPath: string,
-		private config: TestConfig
+		private config: TestConfig,
+		private componentDefaultImport: boolean
 	) {
 		super();
 	}
@@ -20,6 +21,7 @@ class TestTemplate extends BaseTemplate {
 		template
 			.insertImportStatement({
 				importName: pascalComponentName,
+				type: this.componentDefaultImport ? 'default' : 'destructure',
 				filePath: toImportPath(this.importPath),
 			})
 			.insertNewLine(1)

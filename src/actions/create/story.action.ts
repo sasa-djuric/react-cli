@@ -26,6 +26,7 @@ import BaseAction from '../base.action';
 export interface StorybookInputs {
 	name?: string;
 	componentName: string;
+	componentDefaultImport: boolean;
 	filePath: string;
 	nameTypes?: Dictionary<string>;
 	postfixTypes?: Dictionary<string>;
@@ -33,7 +34,7 @@ export interface StorybookInputs {
 }
 
 class CreateStoryAction extends BaseAction {
-	async handle(inputs?: StorybookInputs, options?: Dictionary<any>) {
+	async handle(inputs: StorybookInputs, options?: Dictionary<any>) {
 		const config = merge(
 			options,
 			inputs?.configOverride,
@@ -61,7 +62,8 @@ class CreateStoryAction extends BaseAction {
 		const template = new StorybookTemplate(
 			inputs!.componentName,
 			fixRelativePath(relativeImportPath),
-			config
+			config,
+			inputs?.componentDefaultImport
 		).build();
 
 		await handlePathCheck(filePath.dir);

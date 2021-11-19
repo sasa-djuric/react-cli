@@ -61,8 +61,9 @@ class ComponentTemplate extends BaseTemplate {
 	) {
 		if (isReactNative) {
 			template.insertImportStatement({
-				importName: '{ View }',
+				importName: 'View',
 				filePath: 'react-native',
+				type: 'destructure',
 			});
 
 			return element.insertElement({

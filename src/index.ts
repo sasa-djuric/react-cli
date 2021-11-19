@@ -42,7 +42,7 @@ function onException(ex: Error) {
 
 	await checkConfiguration();
 
-	program.version('1.0.0').description('React CLI');
+	program.version('1.1.0').description('React CLI');
 	commands.add(new InitCommand(new InitAction()));
 	commands.add(new CreateComponentCommand(new CreateComponentAction()));
 	commands.add(new CreateHookCommand(new CreateHookAction()));

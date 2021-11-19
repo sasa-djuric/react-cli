@@ -47,8 +47,8 @@ interface InsertInterface {
 
 interface InsertImportStatement {
 	importName: string;
+	type?: 'default' | 'destructure' | 'all' | 'none-named';
 	filePath: string;
-	importAll?: boolean;
 	insertOptions?: InsertOptions;
 }
 
@@ -99,12 +99,25 @@ class JSTemplateBuilder extends TemplateBuilder {
 	private _insertImportStatement({
 		importName,
 		filePath,
-		importAll = false,
+		type = 'default',
 		insertOptions,
 	}: InsertImportStatement) {
-		const statement = `import ${importName && importAll ? '* as ' : ''}${
-			importName ? importName + ' from ' : ''
-		}'${filePath}';`;
+		const types: Record<Extract<InsertImportStatement['type'], string>, string> = {
+			default: importName,
+			destructure: `{ ${importName} }`,
+			all: `* as ${importName}`,
+			'none-named': '',
+		};
+
+		let statement = '';
+
+		if (type !== 'none-named') {
+			statement = `import ${types[type]} from '${filePath}';`;
+		} else {
+			statement = `import '${filePath}';`;
+		}
+
+		console.log({ statement });
 
 		return this._insert(statement, {
 			insertAfter: 'import',

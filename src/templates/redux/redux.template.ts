@@ -11,7 +11,11 @@ class ReduxTemplate extends BaseTemplate {
 		const body = new JSTemplateBuilder().insertEmptyBody();
 
 		template
-			.insertImportStatement({ importName: '{ connect }', filePath: 'react-redux' })
+			.insertImportStatement({
+				importName: 'connect',
+				type: 'destructure',
+				filePath: 'react-redux',
+			})
 			.insertFunction({
 				name: 'mapStateToProps',
 				args: [`state${typescript ? ': any' : ''}`],

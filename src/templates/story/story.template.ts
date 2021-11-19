@@ -10,7 +10,8 @@ class StoryBookTemplate extends BaseTemplate {
 	constructor(
 		private componentName: string,
 		private importPath: string,
-		private config: StorybookConfig
+		private config: StorybookConfig,
+		private componentDefaultImport: boolean
 	) {
 		super();
 	}
@@ -40,13 +41,15 @@ class StoryBookTemplate extends BaseTemplate {
 
 			template.insertImportStatement({
 				filePath: '@storybook/react',
-				importName: `{ Meta, Story }`,
+				importName: `Meta, Story`,
+				type: 'destructure',
 			});
 		}
 
 		template
 			.insertImportStatement({
 				importName: pascalComponentName,
+				type: this.componentDefaultImport ? 'default' : 'destructure',
 				filePath: toImportPath(this.importPath),
 			})
 			.insertNewLine()
