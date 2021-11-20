@@ -55,6 +55,8 @@ class CreateHookAction extends BaseAction {
 
 		fs.writeFileSync(filePath.full, template.toString(), { encoding: 'utf8' });
 
+		await this.lint(filePath.full);
+
 		if (config.open) {
 			exec(filePath.full);
 		}

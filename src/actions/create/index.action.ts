@@ -58,6 +58,8 @@ class CreateIndexAction extends BaseAction {
 		await handlePathCheck(path.parse(indexFilePath).dir);
 
 		fs.writeFileSync(indexFilePath, template.toString(), { encoding: 'utf-8' });
+
+		await this.lint(indexFilePath);
 	}
 }
 

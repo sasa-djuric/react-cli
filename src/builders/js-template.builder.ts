@@ -117,8 +117,6 @@ class JSTemplateBuilder extends TemplateBuilder {
 			statement = `import '${filePath}';`;
 		}
 
-		console.log({ statement });
-
 		return this._insert(statement, {
 			insertAfter: 'import',
 			newLine: { afterCount: 1 },

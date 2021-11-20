@@ -23,6 +23,8 @@ export interface ProjectConfig {
 	path: string;
 	typescript: boolean;
 	fileNaming: FileNamingConfig;
+	lint: boolean;
+	format: boolean;
 }
 
 export interface ComponentConfig extends BaseConfig {

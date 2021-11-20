@@ -144,6 +144,8 @@ class CreateComponentAction extends BaseAction {
 
 		fs.writeFileSync(path.full, template.toString(), { encoding: 'utf-8' });
 
+		await this.lint(path.full);
+
 		if (config.open) {
 			exec(path.full);
 		}

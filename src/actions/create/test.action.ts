@@ -65,6 +65,8 @@ class CreateTestAction extends BaseAction {
 		await handlePathCheck(filePath.dir);
 
 		fs.writeFileSync(filePath.full, template.toString(), { encoding: 'utf-8' });
+
+		await this.lint(filePath.full);
 	}
 }
 

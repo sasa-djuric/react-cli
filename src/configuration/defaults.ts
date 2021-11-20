@@ -2,6 +2,8 @@ export const defaultConfiguration: any = {
 	project: {
 		path: '/',
 		typescript: false,
+		lint: false,
+		format: false,
 		fileNaming: {
 			name: '{name}',
 			postfix: '',

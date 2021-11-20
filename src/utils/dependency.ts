@@ -5,13 +5,22 @@ import fs from 'fs';
 // Helpers
 import { getProjectRoot } from './path';
 
-export function getAllDependencies() {
+export function getPackageJson() {
 	try {
 		const packageFile = path.resolve(getProjectRoot(), 'package.json');
 		const packageJson = JSON.parse(
 			fs.readFileSync(packageFile, { encoding: 'utf-8' })
 		);
 
+		return packageJson;
+	} catch (err) {
+		return {};
+	}
+}
+
+export function getAllDependencies() {
+	try {
+		const packageJson = getPackageJson();
 		return { ...packageJson.dependencies, ...packageJson.devDependencies };
 	} catch (err) {
 		return {};
