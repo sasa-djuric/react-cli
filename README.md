@@ -105,11 +105,13 @@ The configuration file contains the next scopes (fields):
 
 ### <code>ProjectConfig</code>
 
-| Option     | Type                                   | Description         |
-| ---------- | -------------------------------------- | ------------------- |
-| path       | <code>string</code>                    | Project source path |
-| typescript | <code>boolean</code>                   | Uses typescript     |
-| fileNaming | <code>[FileNaming](#filenaming)</code> | Define file naming  |
+| Option     | Type                                   | Description                                        |
+| ---------- | -------------------------------------- | -------------------------------------------------- |
+| path       | <code>string</code>                    | Project source path                                |
+| typescript | <code>boolean</code>                   | Uses typescript                                    |
+| lint       | <code>boolean</code>                   | Uses eslint if it's used to lint created files     |
+| format     | <code>boolean</code>                   | Uses prettier if it's used to format created files |
+| fileNaming | <code>[FileNaming](#filenaming)</code> | Define file naming                                 |
 
 ### <code>ComponentConfig</code>
 
@@ -237,6 +239,8 @@ The configuration file contains the next scopes (fields):
     "project": {
         "path": "./src",
         "typescript": true,
+        "lint": false,
+        "format": false,
         "fileNaming": {
             "casing": "kebab",
             "postfix": "",
