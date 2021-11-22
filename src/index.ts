@@ -3,6 +3,7 @@
 // Libs
 import program from 'commander';
 import chalk from 'chalk';
+import pacote from 'pacote';
 
 // Configuration
 import { doesConfigurationFileExists } from './configuration';
@@ -32,6 +33,26 @@ async function checkConfiguration() {
 	}
 }
 
+async function checkForUpdate(currentVersion: string) {
+	try {
+		const manifest = await pacote.manifest('cr-react-cli@latest');
+		const latestVersion = manifest.version;
+
+		if (currentVersion !== latestVersion) {
+			const newVersionMessage = chalk.hex('F3AD38')(
+				`A new version ${latestVersion} is available!`
+			);
+			const updateMessage = chalk.gray('Upgrade now:');
+			const updateInstructionsMessage = `${updateMessage} ${chalk.green(
+				'npm install -g cr-react-cli@latest'
+			)}`;
+			const statement = `\n${newVersionMessage}\n${updateInstructionsMessage}\n`;
+
+			console.log(statement);
+		}
+	} catch {}
+}
+
 function onException(ex: Error) {
 	console.error(chalk.red(ex.message));
 	process.exit();
@@ -39,10 +60,12 @@ function onException(ex: Error) {
 
 (async () => {
 	const commands = new Commands();
+	const packageJson = require('../package.json');
 
 	await checkConfiguration();
+	await checkForUpdate(packageJson.version);
 
-	program.version('1.1.0').description('React CLI');
+	program.version(packageJson.version).description('React CLI');
 	commands.add(new InitCommand(new InitAction()));
 	commands.add(new CreateComponentCommand(new CreateComponentAction()));
 	commands.add(new CreateHookCommand(new CreateHookAction()));
