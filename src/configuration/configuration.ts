@@ -25,6 +25,7 @@ export interface ProjectConfig {
 	fileNaming: FileNamingConfig;
 	lint: boolean;
 	format: boolean;
+	verbose: boolean;
 }
 
 export interface ComponentConfig extends BaseConfig {

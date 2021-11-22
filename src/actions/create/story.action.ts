@@ -67,12 +67,7 @@ class CreateStoryAction extends BaseAction {
 		).build();
 
 		await handlePathCheck(filePath.dir);
-
-		fs.writeFileSync(filePath.full, template.toString(), {
-			encoding: 'utf-8',
-		});
-
-		await this.lint(filePath.full);
+		await this.create(filePath.full, template);
 	}
 }
 

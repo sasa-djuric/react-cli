@@ -76,11 +76,7 @@ class CreateStyleAction extends BaseAction {
 			template.include(inputs.template, filePath.fullRelative!);
 		}
 
-		fs.writeFileSync(filePath.full, template.build().toString(), {
-			encoding: 'utf-8',
-		});
-
-		await this.lint(filePath.full);
+		await this.create(filePath.full, template.build());
 	}
 }
 

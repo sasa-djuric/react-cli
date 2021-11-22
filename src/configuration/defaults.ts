@@ -4,6 +4,7 @@ export const defaultConfiguration: any = {
 		typescript: false,
 		lint: false,
 		format: false,
+		verbose: true,
 		fileNaming: {
 			name: '{name}',
 			postfix: '',

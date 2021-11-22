@@ -53,9 +53,7 @@ class CreateHookAction extends BaseAction {
 
 		const template = new HookTemplate(name, config.typescript).build();
 
-		fs.writeFileSync(filePath.full, template.toString(), { encoding: 'utf8' });
-
-		await this.lint(filePath.full);
+		await this.create(filePath.full, template);
 
 		if (config.open) {
 			exec(filePath.full);

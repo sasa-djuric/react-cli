@@ -111,6 +111,7 @@ The configuration file contains the next scopes (fields):
 | typescript | <code>boolean</code>                   | Uses typescript                                    |
 | lint       | <code>boolean</code>                   | Uses eslint if it's used to lint created files     |
 | format     | <code>boolean</code>                   | Uses prettier if it's used to format created files |
+| verbose    | <code>boolean</code>                   | Outputs operation and file path on stdout          |
 | fileNaming | <code>[FileNaming](#filenaming)</code> | Define file naming                                 |
 
 ### <code>ComponentConfig</code>
@@ -241,6 +242,7 @@ The configuration file contains the next scopes (fields):
         "typescript": true,
         "lint": false,
         "format": false,
+        "stdout": true,
         "fileNaming": {
             "casing": "kebab",
             "postfix": "",

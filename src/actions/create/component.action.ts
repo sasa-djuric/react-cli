@@ -85,6 +85,14 @@ class CreateComponentAction extends BaseAction {
 			this.createComponentFolder(path.dir);
 		}
 
+		if (config.redux) {
+			new ReduxTemplate().include(template, config.typescript);
+		}
+
+		if (config.proptypes) {
+			new PropTypesTemplate().include(template, path.namePreferred);
+		}
+
 		if (config.style) {
 			const styleInputs: StyleInputs = {
 				name: path.namePreferred,
@@ -98,12 +106,10 @@ class CreateComponentAction extends BaseAction {
 			await new CreateStyleAction().handle(styleInputs);
 		}
 
-		if (config.redux) {
-			new ReduxTemplate().include(template, config.typescript);
-		}
+		await this.create(path.full, template);
 
-		if (config.proptypes) {
-			new PropTypesTemplate().include(template, path.namePreferred);
+		if (config.open) {
+			exec(path.full);
 		}
 
 		if (config.index) {
@@ -140,14 +146,6 @@ class CreateComponentAction extends BaseAction {
 			};
 
 			await new CreateTestAction().handle(testInputs);
-		}
-
-		fs.writeFileSync(path.full, template.toString(), { encoding: 'utf-8' });
-
-		await this.lint(path.full);
-
-		if (config.open) {
-			exec(path.full);
 		}
 	}
 
