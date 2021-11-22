@@ -17,11 +17,11 @@ import { ComponentConfig, Config } from './configuration';
 
 const fileName = `${settings.CONFIG_NAME}.json`;
 const globalPath = path.resolve(settings.ROOT_PATH, fileName);
-const localPath = path.resolve(getProjectRoot(), fileName);
 
 let config: Config;
 
 export function doesLocalExist() {
+	const localPath = path.resolve(getProjectRoot(), fileName);
 	return fs.existsSync(localPath);
 }
 
@@ -34,6 +34,7 @@ function _loadGlobal(): Config {
 }
 
 function _loadLocal(): Config {
+	const localPath = path.resolve(getProjectRoot(), fileName);
 	return JSON.parse(fs.readFileSync(localPath, { encoding: 'utf8' }));
 }
 

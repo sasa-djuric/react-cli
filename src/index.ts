@@ -4,9 +4,11 @@
 import program from 'commander';
 import chalk from 'chalk';
 import pacote from 'pacote';
+import path from 'path';
 
 // Configuration
 import { doesConfigurationFileExists } from './configuration';
+import settings from './settings';
 
 // Utils
 import { shouldCreateConfig } from './utils/configuration';
@@ -21,6 +23,8 @@ import Commands from './commands';
 import InitCommand from './commands/init.command';
 import CreateComponentCommand from './commands/create/component.command';
 import CreateHookCommand from './commands/create/hook.command';
+
+const packageJson = require(path.resolve(settings.ROOT_PATH, 'package.json'));
 
 async function checkConfiguration() {
 	if (
@@ -44,7 +48,7 @@ async function checkForUpdate(currentVersion: string) {
 			);
 			const updateMessage = chalk.gray('Upgrade now:');
 			const updateInstructionsMessage = `${updateMessage} ${chalk.green(
-				'npm install -g cr-react-cli@latest'
+				`npm install -g cr-react-cli@${latestVersion}`
 			)}`;
 			const statement = `\n${newVersionMessage}\n${updateInstructionsMessage}\n`;
 
@@ -60,7 +64,6 @@ function onException(ex: Error) {
 
 (async () => {
 	const commands = new Commands();
-	const packageJson = require('../package.json');
 
 	await checkConfiguration();
 	await checkForUpdate(packageJson.version);
