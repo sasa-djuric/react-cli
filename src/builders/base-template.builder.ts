@@ -69,8 +69,8 @@ class TemplateBuilder {
 		strBefore: string,
 		strAfter: string
 	) {
-		const startIndex =
-			this.template.indexOf(wrapAfterIndexOf) + wrapAfterIndexOf.length;
+		const startIndexDraft = this.template.indexOf(wrapAfterIndexOf);
+		const startIndex = startIndexDraft + wrapAfterIndexOf.length;
 		const exportName = this.template.substr(
 			startIndex,
 			this.template.lastIndexOf(wrapToIndexOf) - startIndex
@@ -79,6 +79,11 @@ class TemplateBuilder {
 		const wrappedExport = strBefore + exportName + strAfter;
 		const endStartIndex = startIndex + exportName.length;
 		const end = this.template.substr(endStartIndex);
+
+		if (startIndexDraft === -1) {
+			return;
+		}
+
 		const template = start + wrappedExport + end;
 
 		this._override(template);
