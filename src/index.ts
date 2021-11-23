@@ -27,7 +27,16 @@ import CreateHookCommand from './commands/create/hook.command';
 const packageJson = require(path.resolve(settings.ROOT_PATH, 'package.json'));
 
 async function checkConfiguration() {
+	const ignoreForArgs: Record<string, boolean> = {
+		'--version': true,
+		'-V': true,
+		'--help': true,
+		'-h': true,
+	};
+	const isIgnored = process.argv.slice(2).some((arg) => ignoreForArgs[arg]);
+
 	if (
+		!isIgnored &&
 		process.argv[process.argv.length - 1] !== 'init' &&
 		!doesConfigurationFileExists()
 	) {

@@ -21,12 +21,20 @@ const globalPath = path.resolve(settings.ROOT_PATH, fileName);
 let config: Config;
 
 export function doesLocalExist() {
-	const localPath = path.resolve(getProjectRoot(), fileName);
-	return fs.existsSync(localPath);
+	try {
+		const localPath = path.resolve(getProjectRoot(), fileName);
+		return fs.existsSync(localPath);
+	} catch {
+		return false;
+	}
 }
 
 export function doesGlobalExist() {
-	return fs.existsSync(globalPath);
+	try {
+		return fs.existsSync(globalPath);
+	} catch {
+		return false;
+	}
 }
 
 function _loadGlobal(): Config {
