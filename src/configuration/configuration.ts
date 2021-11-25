@@ -66,7 +66,6 @@ export interface Config {
 	component: { [componentType: string]: ComponentConfig };
 	style: StyleConfig;
 	storybook: StorybookConfig;
-	redux: ReduxConfig;
 	test: TestConfig;
 	hook: HookConfig;
 }

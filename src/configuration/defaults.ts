@@ -1,4 +1,7 @@
-export const defaultConfiguration: any = {
+import { Config } from '.';
+import { DeepPartial } from '../types/deep-partial';
+
+export const defaultConfiguration: DeepPartial<Config> = Object.freeze({
 	project: {
 		path: '/',
 		typescript: false,
@@ -57,4 +60,4 @@ export const defaultConfiguration: any = {
 			casing: 'camel',
 		},
 	},
-};
+});

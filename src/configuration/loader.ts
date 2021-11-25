@@ -75,7 +75,7 @@ export function loadConfiguration(): Config {
 	} else if (doesGlobalExist()) {
 		config = _handleMerge(_loadGlobal());
 	} else {
-		config = _handleMerge(defaultConfiguration);
+		config = _handleMerge(defaultConfiguration as Config);
 	}
 
 	return config;
