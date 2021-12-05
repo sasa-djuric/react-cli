@@ -1,5 +1,5 @@
 // Builders
-import TemplateBuilder, { InsertOptions } from './base-template.builder';
+import TemplateBuilder, { createAction, InsertOptions } from './base-template.builder';
 
 interface InsertDOMElement {
 	tag: string;
@@ -78,6 +78,8 @@ export enum JSBuilderActionType {
 	FunctionCall = 'functionCall',
 }
 
+const Action = createAction<JSBuilderActionType>();
+
 class JSTemplateBuilder extends TemplateBuilder {
 	constructor() {
 		super('js');
@@ -96,7 +98,8 @@ class JSTemplateBuilder extends TemplateBuilder {
 		);
 	}
 
-	private _insertImportStatement({
+	@Action(JSBuilderActionType.ImportStatement)
+	public insertImportStatement({
 		importName,
 		filePath,
 		type = 'default',
@@ -124,15 +127,8 @@ class JSTemplateBuilder extends TemplateBuilder {
 		});
 	}
 
-	public insertImportStatement(args: InsertImportStatement) {
-		return this.insertAction({
-			type: JSBuilderActionType.ImportStatement,
-			method: this._insertImportStatement.bind(this),
-			args: [args],
-		});
-	}
-
-	private _insertExportStatement({
+	@Action(JSBuilderActionType.ExportStatement)
+	public insertExportStatement({
 		exportName,
 		defaultExport,
 		wrapExport,
@@ -146,15 +142,8 @@ class JSTemplateBuilder extends TemplateBuilder {
 		return this._insert(statement, insertOptions);
 	}
 
-	public insertExportStatement(args: insertExportStatement) {
-		return this.insertAction({
-			type: JSBuilderActionType.ExportStatement,
-			method: this._insertExportStatement.bind(this),
-			args: [args],
-		});
-	}
-
-	private _insertFunction({
+	@Action(JSBuilderActionType.Function)
+	public insertFunction({
 		name,
 		args = [],
 		arrow = false,
@@ -186,15 +175,8 @@ class JSTemplateBuilder extends TemplateBuilder {
 		return this._insert(template, insertOptions);
 	}
 
-	public insertFunction(options: InsertFunction) {
-		return this.insertAction({
-			type: JSBuilderActionType.Function,
-			method: this._insertFunction.bind(this),
-			args: [options],
-		});
-	}
-
-	private _insertClass({
+	@Action(JSBuilderActionType.Class)
+	public insertClass({
 		name,
 		extendsName,
 		methods,
@@ -224,15 +206,8 @@ class JSTemplateBuilder extends TemplateBuilder {
 		return this._insert(template, insertOptions);
 	}
 
-	public insertClass(options: InsertClass) {
-		return this.insertAction({
-			type: JSBuilderActionType.Class,
-			method: this._insertClass.bind(this),
-			args: [options],
-		});
-	}
-
-	private _insertInterface({
+	@Action(JSBuilderActionType.Interface)
+	public insertInterface({
 		name,
 		extendsName = '',
 		content = {},
@@ -254,15 +229,8 @@ class JSTemplateBuilder extends TemplateBuilder {
 		return this._insert(template, insertOptions);
 	}
 
-	public insertInterface(options: InsertInterface) {
-		return this.insertAction({
-			type: JSBuilderActionType.Interface,
-			method: this._insertInterface.bind(this),
-			args: [options],
-		});
-	}
-
-	private _insertElement({
+	@Action(JSBuilderActionType.Element)
+	public insertElement({
 		tag,
 		props = {},
 		selfClosing = false,
@@ -282,53 +250,24 @@ class JSTemplateBuilder extends TemplateBuilder {
 		return this._insert(template, insertOptions);
 	}
 
-	public insertElement(args: InsertDOMElement) {
-		return this.insertAction({
-			type: JSBuilderActionType.Element,
-			method: this._insertElement.bind(this),
-			args: [args],
-		});
-	}
-
-	private _insertFunctionCall({ name, args, insertOptions }: InsertFunctionCall) {
+	@Action(JSBuilderActionType.FunctionCall)
+	public insertFunctionCall({ name, args, insertOptions }: InsertFunctionCall) {
 		const packedArgs = args
 			.map((item) => (item instanceof TemplateBuilder ? item.toString() : item))
 			.join(', ');
 		const template = `${name}(${packedArgs});`;
 
-		this._insert(template, insertOptions);
+		return this._insert(template, insertOptions);
 	}
 
-	public insertFunctionCall(args: InsertFunctionCall) {
-		return this.insertAction({
-			type: JSBuilderActionType.FunctionCall,
-			method: this._insertFunctionCall.bind(this),
-			args: [args],
-		});
-	}
-
-	private _insertEmptyBody(insertOptions?: InsertOptions) {
+	@Action(JSBuilderActionType.Body)
+	public insertEmptyBody(insertOptions?: InsertOptions) {
 		return this._insert('{\n\n};', insertOptions);
 	}
 
-	public insertEmptyBody(insertOptions?: InsertOptions) {
-		return this.insertAction({
-			type: JSBuilderActionType.Body,
-			method: this._insertEmptyBody.bind(this),
-			args: [insertOptions],
-		});
-	}
-
-	private _wrapExport(wrapper: string) {
-		this.wrap('export default ', ';', `${wrapper}(`, ')');
-	}
-
+	@Action(JSBuilderActionType.WrapExport)
 	public wrapExport(wrapper: string) {
-		return this.insertAction({
-			type: JSBuilderActionType.WrapExport,
-			method: this._wrapExport.bind(this),
-			args: [wrapper],
-		});
+		this.wrap('export default ', ';', `${wrapper}(`, ')');
 	}
 }
 

@@ -34,6 +34,25 @@ enum ActionType {
 	NewLine = 'newLine',
 }
 
+export const createAction =
+	<T>() =>
+	(type: T) => {
+		return (target: any, propertyName: string, descriptor: PropertyDescriptor) => {
+			const originalFn = descriptor.value;
+
+			descriptor.value = function () {
+				// @ts-ignore
+				this.actions[this.nextId++] = {
+					type,
+					method: originalFn.bind(this),
+					args: arguments,
+				};
+
+				return this;
+			};
+		};
+	};
+
 class TemplateBuilder {
 	private template: string = '';
 	private nextId: number = 0;
