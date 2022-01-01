@@ -1,28 +1,39 @@
 // Libs
-import casing from 'case';
+import j from 'jscodeshift';
 
-// Builders
-import JSTemplateBuilder from '../../builders/js-template.builder';
+// Types
+import { HookConfig } from '../../configuration';
+import { constructTemplate } from '../../utils/template';
 
 // Base
 import BaseTemplate from '../base.template';
 
 class HookTemplate extends BaseTemplate {
-	constructor(private name: string, private typescript: boolean) {
+	constructor(private name: string, private config: HookConfig) {
 		super();
 	}
 
 	build() {
-		const name = casing.camel(this.name);
-		const template = new JSTemplateBuilder()
-			.insertFunction({ name: name, arrow: true, body: true })
-			.insertNewLine()
-			.insertExportStatement({
-				exportName: name,
-				defaultExport: true,
-			});
+		const body = [];
 
-		return template.toString();
+		const hook = j.variableDeclaration('const', [
+			j.variableDeclarator(
+				j.identifier(this.name),
+				j.arrowFunctionExpression([], j.blockStatement([]))
+			),
+		]);
+
+		if (this.config.defaultExport) {
+			body.push(
+				j.exportDefaultDeclaration(
+					j.arrowFunctionExpression([], j.blockStatement([]))
+				)
+			);
+		} else {
+			body.push(j.exportDeclaration(false, hook));
+		}
+
+		return constructTemplate(body);
 	}
 }
 

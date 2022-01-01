@@ -59,6 +59,7 @@ export interface TestConfig extends BaseConfig {}
 
 export interface HookConfig extends BaseConfig {
 	open: boolean;
+	defaultExport: boolean;
 }
 
 export interface Config {

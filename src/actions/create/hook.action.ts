@@ -1,10 +1,11 @@
 // Libs
 import fs from 'fs';
+import casing from 'case';
 import { exec } from 'child_process';
+import { merge } from 'lodash';
 
 // Helpers
 import FilePath from '../../file-path';
-import { merge } from 'lodash';
 import { handleFileCheck, handlePathCheck } from '../../utils/path';
 
 // Configuration
@@ -51,7 +52,7 @@ class CreateHookAction extends BaseAction {
 			this.createFolder(filePath.dir);
 		}
 
-		const template = new HookTemplate(name, config.typescript).build();
+		const template = new HookTemplate(casing.camel(name), config).build();
 
 		await this.create(filePath.full, template.toString());
 

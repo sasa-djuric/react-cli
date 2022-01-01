@@ -56,6 +56,7 @@ export const defaultConfiguration: DeepPartial<Config> = Object.freeze({
 	},
 	hook: {
 		path: '/hooks',
+		defaultExport: false,
 		fileNaming: {
 			casing: 'camel',
 		},
