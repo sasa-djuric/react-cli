@@ -1,10 +1,9 @@
-import TemplateBuilder from '../../builders/base-template.builder';
-import JSTemplateBuilder from '../../builders/js-template.builder';
-import { StorybookConfig } from '../../configuration';
+import j from 'jscodeshift';
 import BaseTemplate from '../base.template';
-import casing from 'case';
+import { StorybookConfig } from '../../configuration';
 import { toImportPath } from '../../utils/path';
 import { getDependencyVersion } from '../../utils/dependency';
+import { constructTemplate } from '../../utils/template';
 
 class StoryBookTemplate extends BaseTemplate {
 	constructor(
@@ -17,64 +16,111 @@ class StoryBookTemplate extends BaseTemplate {
 	}
 
 	build(): string {
-		const template = new JSTemplateBuilder();
-		const templateComponent = new JSTemplateBuilder();
-		const pascalComponentName = casing.pascal(this.componentName);
+		const body = [];
 		const reactVersion = getDependencyVersion('react');
 
-		templateComponent.insertElement({
-			tag: pascalComponentName,
-			spreadProps: true,
-			selfClosing: true,
-		});
-
 		if (!reactVersion || reactVersion < 17.01) {
-			template.insertImportStatement({ importName: 'React', filePath: 'react' });
+			body.push(
+				j.importDeclaration(
+					[j.importDefaultSpecifier(j.identifier('React'))],
+					j.literal('react')
+				)
+			);
 		}
-
-		let storyDefinition = `{\n    title: 'Components/${pascalComponentName}',\n    component: ${pascalComponentName}\n}`;
-		let templateInterface = ``;
 
 		if (this.config.typescript) {
-			storyDefinition = `${storyDefinition} as Meta`;
-			templateInterface = `Story`;
-
-			template.insertImportStatement({
-				filePath: '@storybook/react',
-				importName: `Meta, Story`,
-				type: 'destructure',
-			});
+			body.push(
+				j.importDeclaration(
+					[
+						j.importSpecifier(j.identifier('Meta')),
+						j.importSpecifier(j.identifier('Story')),
+					],
+					j.literal('@storybook/react')
+				)
+			);
 		}
 
-		template
-			.insertImportStatement({
-				importName: pascalComponentName,
-				type: this.componentDefaultImport ? 'default' : 'destructure',
-				filePath: toImportPath(this.importPath),
-			})
-			.insertNewLine()
-			.insertExportStatement({
-				exportName: storyDefinition,
-				defaultExport: true,
-			})
-			.insertNewLine(2)
-			.insertFunction({
-				name: 'Template',
-				args: ['props'],
-				arrow: true,
-				content: templateComponent,
-				body: false,
-				interfaceName: templateInterface,
-			})
-			.insertNewLine()
-			.insertExportStatement({
-				exportName: `const Primary = Template.bind({})`,
-				defaultExport: false,
-			})
-			.insertNewLine(2)
-			.insert(`Primary.args = {\n\n};`);
+		const componentImportSpecifier = this.componentDefaultImport
+			? j.importDefaultSpecifier
+			: j.importSpecifier;
 
-		return template.toString();
+		body.push(
+			j.importDeclaration(
+				[componentImportSpecifier(j.identifier(this.componentName))],
+				j.literal(toImportPath(this.importPath))
+			)
+		);
+
+		const metaObject = j.objectExpression([
+			j.objectProperty(j.identifier('title'), j.literal(this.componentName)),
+		]);
+
+		if (this.config.typescript) {
+			body.push(
+				j.exportDefaultDeclaration(
+					j.tsAsExpression(metaObject, j.tsTypeReference(j.identifier('Meta')))
+				)
+			);
+		} else {
+			body.push(j.exportDefaultDeclaration(metaObject));
+		}
+
+		const templateComponentIdentifier = j.identifier('Template');
+
+		if (this.config.typescript) {
+			templateComponentIdentifier.typeAnnotation = j.typeAnnotation(
+				j.genericTypeAnnotation(j.identifier('Story'), null)
+			);
+		}
+
+		body.push(
+			j.variableDeclaration('const', [
+				j.variableDeclarator(
+					templateComponentIdentifier,
+					j.arrowFunctionExpression(
+						[j.identifier('props')],
+						j.jsxElement(
+							j.jsxOpeningElement(
+								j.jsxIdentifier(this.componentName),
+								[j.jsxSpreadAttribute(j.identifier('props'))],
+								true
+							)
+						)
+					)
+				),
+			])
+		);
+
+		body.push(
+			'\n',
+			j.exportNamedDeclaration(
+				j.variableDeclaration('const', [
+					j.variableDeclarator(
+						j.identifier('Default'),
+						j.callExpression(
+							j.memberExpression(
+								j.identifier('Template'),
+								j.identifier('bind')
+							),
+							[j.objectExpression([])]
+						)
+					),
+				])
+			)
+		);
+
+		body.push(
+			'\n',
+			j.expressionStatement(
+				j.assignmentExpression(
+					'=',
+					j.memberExpression(j.identifier('Default'), j.identifier('args')),
+					j.objectExpression([])
+				)
+			)
+		);
+
+		return constructTemplate(body);
 	}
 }
 
