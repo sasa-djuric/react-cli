@@ -4,6 +4,7 @@ import { DeclarationKind } from 'ast-types/gen/kinds';
 
 // Utils
 import { getDependencyVersion, doesDependencyExists } from '../../utils/dependency';
+import { constructTemplate } from '../../utils/template';
 
 // Types
 import { ComponentConfig } from '../../configuration';
@@ -17,10 +18,10 @@ class ComponentTemplate extends BaseTemplate {
 	}
 
 	build() {
-		const template = j('');
 		const body = [];
 		const reactVersion = getDependencyVersion('react');
 		const isReactNative = doesDependencyExists('react-native');
+		const propsInterfaceName = this.name + 'Props';
 		let elementTag = isReactNative ? 'View' : 'div';
 		let elementAttributes: Array<JSXAttribute> = [];
 		let component: DeclarationKind;
@@ -30,6 +31,42 @@ class ComponentTemplate extends BaseTemplate {
 				j.importDeclaration(
 					[j.importDefaultSpecifier(j.identifier('React'))],
 					j.literal('react')
+				)
+			);
+		}
+
+		if (isReactNative) {
+			body.unshift(
+				j.importDeclaration(
+					[j.importSpecifier(j.identifier('View'))],
+					j.literal('react-native')
+				)
+			);
+		}
+
+		if (this.config.typescript) {
+			body.push(
+				'\n',
+				j.interfaceDeclaration(
+					j.identifier(propsInterfaceName),
+					j.objectTypeAnnotation([]),
+					[]
+				)
+			);
+		}
+
+		const componentIdentifier = j.identifier(this.name);
+
+		if (this.config.typescript) {
+			componentIdentifier.typeAnnotation = j.typeAnnotation(
+				j.genericTypeAnnotation(
+					j.qualifiedTypeIdentifier(
+						j.identifier('React'),
+						j.identifier('FunctionComponent')
+					),
+					j.typeParameterInstantiation([
+						j.genericTypeAnnotation(j.identifier(propsInterfaceName), null),
+					])
 				)
 			);
 		}
@@ -47,31 +84,6 @@ class ComponentTemplate extends BaseTemplate {
 			j.jsxOpeningElement(j.jsxIdentifier(elementTag), elementAttributes),
 			j.jsxClosingElement(j.jsxIdentifier(elementTag))
 		);
-
-		if (isReactNative) {
-			body.unshift(
-				j.importDeclaration(
-					[j.importSpecifier(j.identifier('View'))],
-					j.literal('react-native')
-				)
-			);
-		}
-
-		const componentIdentifier = j.identifier(this.name);
-
-		if (this.config.typescript) {
-			componentIdentifier.typeAnnotation = j.typeAnnotation(
-				j.genericTypeAnnotation(
-					j.qualifiedTypeIdentifier(
-						j.identifier('React'),
-						j.identifier('FunctionComponent')
-					),
-					j.typeParameterInstantiation([
-						j.genericTypeAnnotation(j.identifier(this.name + 'Props'), null),
-					])
-				)
-			);
-		}
 
 		if (this.config.class) {
 			component = j.classDeclaration(
@@ -93,7 +105,7 @@ class ComponentTemplate extends BaseTemplate {
 
 			if (this.config.typescript) {
 				component.superTypeParameters = j.typeParameterInstantiation([
-					j.genericTypeAnnotation(j.identifier(this.name + 'Props'), null),
+					j.genericTypeAnnotation(j.identifier(propsInterfaceName), null),
 				]);
 			}
 		} else {
@@ -115,9 +127,7 @@ class ComponentTemplate extends BaseTemplate {
 			body.push(j.exportDeclaration(false, component));
 		}
 
-		template.get().value.program.body = body;
-
-		return template.toSource();
+		return constructTemplate(body);
 	}
 }
 
