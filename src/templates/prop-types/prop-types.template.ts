@@ -4,7 +4,7 @@ import BaseTemplate from '../base.template';
 import casing from 'case';
 
 class PropTypesTemplate extends BaseTemplate {
-	build(): TemplateBuilder {
+	build(): string {
 		throw new Error('Method not implemented.');
 	}
 

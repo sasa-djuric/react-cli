@@ -16,7 +16,7 @@ class StoryBookTemplate extends BaseTemplate {
 		super();
 	}
 
-	build(): TemplateBuilder {
+	build(): string {
 		const template = new JSTemplateBuilder();
 		const templateComponent = new JSTemplateBuilder();
 		const pascalComponentName = casing.pascal(this.componentName);
@@ -74,7 +74,7 @@ class StoryBookTemplate extends BaseTemplate {
 			.insertNewLine(2)
 			.insert(`Primary.args = {\n\n};`);
 
-		return template;
+		return template.toString();
 	}
 }
 

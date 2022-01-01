@@ -10,7 +10,7 @@ export interface BaseStyleTypeTemplateI {
 abstract class BaseStyleTypeTemplate {
 	constructor(protected name: string, protected config: StyleConfig) {}
 
-	abstract build(): TemplateBuilder;
+	abstract build(): string;
 
 	abstract include(
 		template: JSTemplateBuilder,

@@ -76,7 +76,7 @@ class CreateStyleAction extends BaseAction {
 			template.include(inputs.template, filePath.fullRelative!);
 		}
 
-		await this.create(filePath.full, template.build());
+		await this.create(filePath.full, template.build().toString());
 	}
 }
 

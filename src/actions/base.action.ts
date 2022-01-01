@@ -10,9 +10,6 @@ import { format } from '../utils/format';
 import { lint as _lint } from '../utils/lint';
 import { createMessage } from '../ui/messages';
 
-// Builders
-import TemplateBuilder from '../builders/base-template.builder';
-
 abstract class BaseAction {
 	private readonly projectConfig = loadScopeConfiguration('project');
 
@@ -28,8 +25,8 @@ abstract class BaseAction {
 		}
 	}
 
-	public async create(absolutePath: string, template: TemplateBuilder) {
-		await fs.writeFile(absolutePath, template.toString(), { encoding: 'utf-8' });
+	public async create(absolutePath: string, template: string) {
+		await fs.writeFile(absolutePath, template, { encoding: 'utf-8' });
 		await this.lint(absolutePath);
 
 		if (this.projectConfig.verbose) {

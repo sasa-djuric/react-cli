@@ -67,7 +67,7 @@ class CreateStoryAction extends BaseAction {
 		).build();
 
 		await handlePathCheck(filePath.dir);
-		await this.create(filePath.full, template);
+		await this.create(filePath.full, template.toString());
 	}
 }
 

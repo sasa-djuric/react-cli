@@ -56,7 +56,7 @@ class CreateIndexAction extends BaseAction {
 		).build();
 
 		await handlePathCheck(path.parse(indexFilePath).dir);
-		await this.create(indexFilePath, template);
+		await this.create(indexFilePath, template.toString());
 	}
 }
 

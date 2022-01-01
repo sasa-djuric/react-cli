@@ -25,9 +25,6 @@ import {
 import ReduxTemplate from '../../templates/redux/redux.template';
 import PropTypesTemplate from '../../templates/prop-types/prop-types.template';
 import ComponentTemplate from '../../templates/component/compnent.template';
-import ClassComponentTemplate from '../../templates/component/class.component.template';
-import FunctionalComponentTemplate from '../../templates/component/functional.component.template';
-import { BaseComponentTypeTemplateI } from '../../templates/component/base.component.type.template';
 
 // Base
 import BaseAction from '../base.action';
@@ -55,6 +52,7 @@ class CreateComponentAction extends BaseAction {
 		const scopeConfig = loadScopeConfiguration('component')[inputs.type];
 		const config = merge({ ...options }, scopeConfig) as ComponentConfig;
 		const compnentTypePostfix = inputs.type === 'default' ? 'component' : inputs.type;
+		const componentName = casing.pascal(inputs.name);
 
 		const path = new FilePath({
 			name: inputs.name,
@@ -68,15 +66,7 @@ class CreateComponentAction extends BaseAction {
 			fileExtension: config.typescript ? 'tsx' : 'jsx',
 		});
 
-		const ComponentTypeTemplate = config?.class
-			? ClassComponentTemplate
-			: FunctionalComponentTemplate;
-
-		const template = new ComponentTemplate(
-			path.namePreferred,
-			config,
-			ComponentTypeTemplate as BaseComponentTypeTemplateI
-		).build();
+		const template = new ComponentTemplate(componentName, config).build();
 
 		await handlePathCheck(path.baseDir);
 		await handleFileCheck(path.full);
@@ -85,26 +75,26 @@ class CreateComponentAction extends BaseAction {
 			this.createComponentFolder(path.dir);
 		}
 
-		if (config.redux) {
-			new ReduxTemplate().include(template, config.typescript);
-		}
+		// if (config.redux) {
+		// 	new ReduxTemplate().include(template, config.typescript);
+		// }
 
-		if (config.proptypes) {
-			new PropTypesTemplate().include(template, path.namePreferred);
-		}
+		// if (config.proptypes) {
+		// 	new PropTypesTemplate().include(template, path.namePreferred);
+		// }
 
-		if (config.style) {
-			const styleInputs: StyleInputs = {
-				name: path.namePreferred,
-				filePath: path.dir,
-				nameTypes: { '{name}': path.namePreferred },
-				postfixTypes: { '{componentType}': inputs.type },
-				configOverride: config.override?.style,
-				template,
-			};
+		// if (config.style) {
+		// 	const styleInputs: StyleInputs = {
+		// 		name: path.namePreferred,
+		// 		filePath: path.dir,
+		// 		nameTypes: { '{name}': path.namePreferred },
+		// 		postfixTypes: { '{componentType}': inputs.type },
+		// 		configOverride: config.override?.style,
+		// 		template,
+		// 	};
 
-			await new CreateStyleAction().handle(styleInputs);
-		}
+		// 	await new CreateStyleAction().handle(styleInputs);
+		// }
 
 		await this.create(path.full, template);
 

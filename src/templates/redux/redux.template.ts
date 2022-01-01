@@ -3,7 +3,7 @@ import JSTemplateBuilder from '../../builders/js-template.builder';
 import BaseTemplate from '../base.template';
 
 class ReduxTemplate extends BaseTemplate {
-	build(): TemplateBuilder {
+	build(): string {
 		throw new Error('Method not implemented.');
 	}
 

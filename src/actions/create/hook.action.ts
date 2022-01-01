@@ -53,7 +53,7 @@ class CreateHookAction extends BaseAction {
 
 		const template = new HookTemplate(name, config.typescript).build();
 
-		await this.create(filePath.full, template);
+		await this.create(filePath.full, template.toString());
 
 		if (config.open) {
 			exec(filePath.full);

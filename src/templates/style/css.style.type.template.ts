@@ -11,7 +11,7 @@ class CSSStyleTypeTemplate extends BaseStyleTypeTemplate {
 
 		template.insertClass(casing.kebab(this.name));
 
-		return template;
+		return template.toString();
 	}
 
 	include(

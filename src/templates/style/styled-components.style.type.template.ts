@@ -19,7 +19,7 @@ class JSStyleTypeTemplate extends BaseStyleTypeTemplate {
 				defaultExport: false,
 			});
 
-		return template;
+		return template.toString();
 	}
 
 	include(

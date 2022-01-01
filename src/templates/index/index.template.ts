@@ -11,7 +11,7 @@ class IndexTemplate extends BaseTemplate {
 		super();
 	}
 
-	build(): TemplateBuilder {
+	build() {
 		const template = new JSTemplateBuilder();
 		const { importPath } = this;
 		const exportName =
@@ -27,7 +27,7 @@ class IndexTemplate extends BaseTemplate {
 			exportFrom: toImportPath(importPath),
 		});
 
-		return template;
+		return template.toString();
 	}
 }
 

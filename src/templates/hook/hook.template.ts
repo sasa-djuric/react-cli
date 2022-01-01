@@ -22,7 +22,7 @@ class HookTemplate extends BaseTemplate {
 				defaultExport: true,
 			});
 
-		return template;
+		return template.toString();
 	}
 }
 

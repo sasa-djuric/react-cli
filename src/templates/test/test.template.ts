@@ -48,7 +48,7 @@ class TestTemplate extends BaseTemplate {
 				],
 			});
 
-		return template;
+		return template.toString();
 	}
 }
 
