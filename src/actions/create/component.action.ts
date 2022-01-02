@@ -75,9 +75,9 @@ class CreateComponentAction extends BaseAction {
 			this.createComponentFolder(path.dir);
 		}
 
-		// if (config.redux) {
-		// 	new ReduxTemplate().include(template, config.typescript);
-		// }
+		if (config.redux) {
+			template = new ReduxTemplate().include(template, config.typescript);
+		}
 
 		if (config.proptypes) {
 			template = new PropTypesTemplate().include(template, componentName);

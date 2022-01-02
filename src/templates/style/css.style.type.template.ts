@@ -31,7 +31,7 @@ class CSSStyleTypeTemplate extends BaseStyleTypeTemplate {
 
 		const jsxElement: JSXElement = root.findJSXElements().at(0).get().value;
 
-		jsxElement.openingElement.attributes?.push(
+		jsxElement.openingElement.attributes?.unshift(
 			j.jsxAttribute(
 				j.jsxIdentifier('className'),
 				j.jsxExpressionContainer(
