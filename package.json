@@ -54,6 +54,10 @@
 		"typescript": "^4.5.4"
 	},
 	"dependencies": {
+		"@babel/core": "^7.16.7",
+		"@babel/plugin-proposal-class-properties": "^7.16.7",
+		"@babel/plugin-syntax-jsx": "^7.16.7",
+		"@babel/plugin-syntax-typescript": "^7.16.7",
 		"ast-types": "^0.14.2",
 		"case": "^1.6.3",
 		"chalk": "^4.1.0",

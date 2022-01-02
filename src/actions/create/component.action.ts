@@ -66,7 +66,7 @@ class CreateComponentAction extends BaseAction {
 			fileExtension: config.typescript ? 'tsx' : 'jsx',
 		});
 
-		const template = new ComponentTemplate(componentName, config).build();
+		let template = new ComponentTemplate(componentName, config).build();
 
 		await handlePathCheck(path.baseDir);
 		await handleFileCheck(path.full);
@@ -79,9 +79,9 @@ class CreateComponentAction extends BaseAction {
 		// 	new ReduxTemplate().include(template, config.typescript);
 		// }
 
-		// if (config.proptypes) {
-		// 	new PropTypesTemplate().include(template, path.namePreferred);
-		// }
+		if (config.proptypes) {
+			template = new PropTypesTemplate().include(template, componentName);
+		}
 
 		// if (config.style) {
 		// 	const styleInputs: StyleInputs = {
