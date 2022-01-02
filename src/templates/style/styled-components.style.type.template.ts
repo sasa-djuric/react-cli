@@ -1,46 +1,65 @@
+import j, { JSXElement } from 'jscodeshift';
 import BaseStyleTypeTemplate from './base.style.type.template';
-import JSTemplateBuilder from '../../builders/js-template.builder';
-import casing from 'case';
 import { removeExtension } from '../../utils/path';
+import { constructTemplate } from '../../utils/template';
+import { parser } from '../../parser';
 
 class JSStyleTypeTemplate extends BaseStyleTypeTemplate {
 	build() {
-		const { name, config } = this;
-		const template = new JSTemplateBuilder();
+		const body = [];
 
-		template
-			.insertImportStatement({
-				importName: 'styled',
-				filePath: 'styled-components',
-			})
-			.insertNewLine()
-			.insertExportStatement({
-				exportName: `const ${casing.pascal(name)}Element = styled.div\`\n\n\``,
-				defaultExport: false,
-			});
+		body.push(
+			j.importDeclaration(
+				[j.importDefaultSpecifier(j.identifier('styled'))],
+				j.literal('styled-components')
+			)
+		);
 
-		return template.toString();
+		body.push(
+			j.exportNamedDeclaration(
+				j.variableDeclaration('const', [
+					j.variableDeclarator(
+						j.identifier(`Styled${this.name}`),
+						j.taggedTemplateExpression(
+							j.memberExpression(
+								j.identifier('styled'),
+								j.identifier('div')
+							),
+							j.templateLiteral(
+								[j.templateElement({ raw: '', cooked: '' }, true)],
+								[]
+							)
+						)
+					),
+				])
+			)
+		);
+
+		return constructTemplate(body);
 	}
 
-	include(
-		template: JSTemplateBuilder,
-		name: string,
-		importPath: string,
-		elementAction: any
-	) {
-		const elementName = `${casing.pascal(name)}Element`;
+	include(template: string, name: string, importPath: string) {
+		const root = j(template, { parser });
+		const elementName = `Styled${name}`;
 
-		if (elementAction) {
-			elementAction.tag = elementName;
-			elementAction.props = {};
-			elementAction.children = '\n\n';
+		root.find(j.ImportDeclaration)
+			.at(-1)
+			.insertAfter(
+				j.importDeclaration(
+					[j.importSpecifier(j.identifier(elementName))],
+					j.literal(removeExtension(importPath))
+				)
+			);
+
+		const jsxElement: JSXElement = root.findJSXElements().at(0).get().value;
+
+		jsxElement.openingElement.name = j.jsxIdentifier(elementName);
+
+		if (jsxElement.closingElement) {
+			jsxElement.closingElement.name = j.jsxIdentifier(elementName);
 		}
 
-		template.insertImportStatement({
-			importName: `${elementName}`,
-			type: 'destructure',
-			filePath: removeExtension(importPath),
-		});
+		return root.toSource();
 	}
 }
 

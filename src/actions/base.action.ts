@@ -8,7 +8,7 @@ import Dictionary from '../types/dictionary';
 import { loadScopeConfiguration } from '../configuration';
 import { format } from '../utils/format';
 import { lint as _lint } from '../utils/lint';
-import { createMessage } from '../ui/messages';
+import { createMessage, updateMessage } from '../ui/messages';
 
 abstract class BaseAction {
 	private readonly projectConfig = loadScopeConfiguration('project');
@@ -31,6 +31,19 @@ abstract class BaseAction {
 
 		if (this.projectConfig.verbose) {
 			createMessage(absolutePath);
+		}
+	}
+
+	public async update(absolutePath: string, template: string) {
+		try {
+			await fs.unlink(absolutePath);
+		} catch {}
+
+		await fs.writeFile(absolutePath, template, { encoding: 'utf-8' });
+		await this.lint(absolutePath);
+
+		if (this.projectConfig.verbose) {
+			updateMessage(absolutePath);
 		}
 	}
 }

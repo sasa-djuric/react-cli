@@ -1,9 +1,6 @@
 import BaseTemplate from '../base.template';
 import { StyleConfig } from '../../configuration';
 import { BaseStyleTypeTemplateI } from './base.style.type.template';
-import JSTemplateBuilder, {
-	JSBuilderActionType,
-} from '../../builders/js-template.builder';
 import { toImportPath } from '../../utils/path';
 
 class StyleTemplate extends BaseTemplate {
@@ -21,34 +18,11 @@ class StyleTemplate extends BaseTemplate {
 		return new StyleTypeTemplate(name, config).build();
 	}
 
-	include(template: JSTemplateBuilder, filePath: string) {
-		let action;
-		const { name, config, StyleTypeTemplate } = this;
-		const functionAction = template
-			.getActionsByType(JSBuilderActionType.Function)
-			?.find((action) =>
-				action?.args[0]?.content?.getActionsByType(JSBuilderActionType.Element)
-			);
-		const classAction = template
-			.getActionsByType(JSBuilderActionType.Class)
-			?.find((action) => action.args[0]?.methods?.[0]?.content);
-
-		if (functionAction) {
-			action = functionAction?.args[0].content;
-		}
-
-		if (classAction) {
-			action = classAction?.args[0]?.methods?.[0]?.content;
-		}
-
-		const elementAction = action?.getActionsByType(JSBuilderActionType.Element)?.[0]
-			?.args?.[0];
-
-		new StyleTypeTemplate(name, config).include(
+	include(template: string, filePath: string): string {
+		return new this.StyleTypeTemplate(this.name, this.config).include(
 			template,
-			name,
-			toImportPath(filePath),
-			elementAction
+			this.name,
+			toImportPath(filePath)
 		);
 	}
 }

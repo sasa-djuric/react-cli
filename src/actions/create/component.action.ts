@@ -83,20 +83,21 @@ class CreateComponentAction extends BaseAction {
 			template = new PropTypesTemplate().include(template, componentName);
 		}
 
-		// if (config.style) {
-		// 	const styleInputs: StyleInputs = {
-		// 		name: path.namePreferred,
-		// 		filePath: path.dir,
-		// 		nameTypes: { '{name}': path.namePreferred },
-		// 		postfixTypes: { '{componentType}': inputs.type },
-		// 		configOverride: config.override?.style,
-		// 		template,
-		// 	};
-
-		// 	await new CreateStyleAction().handle(styleInputs);
-		// }
-
 		await this.create(path.full, template);
+
+		if (config.style) {
+			const styleInputs: StyleInputs = {
+				name: componentName,
+				filePath: path.dir,
+				fileName: path.name + '.' + path.ext,
+				nameTypes: { '{name}': path.namePreferred },
+				postfixTypes: { '{componentType}': inputs.type },
+				configOverride: config.override?.style,
+				template,
+			};
+
+			await new CreateStyleAction().handle(styleInputs);
+		}
 
 		if (config.open) {
 			exec(path.full);

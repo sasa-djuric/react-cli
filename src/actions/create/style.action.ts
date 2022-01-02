@@ -1,5 +1,5 @@
 // Libs
-import fs from 'fs';
+import path from 'path';
 
 // Constants
 import { cssStyleTypes } from '../../constants';
@@ -29,14 +29,15 @@ import BaseAction from '../base.action';
 export interface StyleInputs {
 	name: string;
 	filePath: string;
+	fileName: string;
 	nameTypes?: Dictionary<string>;
 	postfixTypes?: Dictionary<string>;
-	template?: JSTemplateBuilder;
+	template: string;
 	configOverride?: StyleConfig;
 }
 
 class CreateStyleAction extends BaseAction {
-	async handle(inputs?: StyleInputs, options?: Dictionary<any>) {
+	async handle(inputs: StyleInputs, options?: Dictionary<any>) {
 		const config = merge(
 			options,
 			inputs?.configOverride,
@@ -72,9 +73,14 @@ class CreateStyleAction extends BaseAction {
 
 		await handlePathCheck(filePath.dir);
 
-		if (inputs?.template) {
-			template.include(inputs.template, filePath.fullRelative!);
-		}
+		const componentTemplate = template.include(
+			inputs.template,
+			filePath.fullRelative!
+		);
+
+		const componentFilePath = path.join(inputs.filePath, inputs.fileName);
+
+		this.update(componentFilePath, componentTemplate);
 
 		await this.create(filePath.full, template.build().toString());
 	}

@@ -1,5 +1,4 @@
 import TemplateBuilder from '../../builders/base-template.builder';
-import JSTemplateBuilder from '../../builders/js-template.builder';
 import { StyleConfig } from '../../configuration';
 
 export interface BaseStyleTypeTemplateI {
@@ -12,12 +11,7 @@ abstract class BaseStyleTypeTemplate {
 
 	abstract build(): string;
 
-	abstract include(
-		template: JSTemplateBuilder,
-		name: string,
-		importPath: string,
-		elementAction: any
-	): void;
+	abstract include(template: string, name: string, importPath: string): string;
 }
 
 export default BaseStyleTypeTemplate;
