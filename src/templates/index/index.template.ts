@@ -1,4 +1,5 @@
 import j from 'jscodeshift';
+import { namedTypes } from 'ast-types/gen/namedTypes';
 import BaseTemplate from '../base.template';
 import { toImportPath } from '../../utils/path';
 import { constructTemplate } from '../../utils/template';
@@ -22,12 +23,17 @@ class IndexTemplate extends BaseTemplate {
 				)
 			);
 		} else {
+			const specifier: namedTypes.ExportSpecifier = {
+				type: 'ExportSpecifier',
+				local: j.identifier('default'),
+				exported: j.identifier('default'),
+			};
+
 			body.push(
-				j.exportDeclaration(
-					false,
+				j.exportNamedDeclaration(
 					null,
-					[j.exportSpecifier(j.identifier('default'), null)],
-					j.literal(toImportPath(this.importPath))
+					[specifier],
+					j.stringLiteral(toImportPath(this.importPath))
 				)
 			);
 		}
