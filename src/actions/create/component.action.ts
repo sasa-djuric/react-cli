@@ -129,7 +129,7 @@ class CreateComponentAction extends BaseAction {
 		if (config.test) {
 			const testInputs: TestInputs = {
 				filePath: path.full,
-				componentName: path.namePreferred,
+				componentName: componentName,
 				componentDefaultImport: config.defaultExport,
 				nameTypes: { '{name}': path.namePreferred },
 				configOverride: config.override?.test,
