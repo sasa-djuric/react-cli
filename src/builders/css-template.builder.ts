@@ -1,5 +1,5 @@
 import { cssStyleType } from '../configuration';
-import TemplateBuilder, { InsertOptions } from './base-template.builder';
+import TemplateBuilder from './base-template.builder';
 
 class CSSTemplateBuilder extends TemplateBuilder {
 	constructor(private type: cssStyleType) {
@@ -14,14 +14,9 @@ class CSSTemplateBuilder extends TemplateBuilder {
 		return content;
 	}
 
-	public insertClass(
-		className: string,
-		content?: string,
-		insertOptions?: InsertOptions
-	) {
+	public insertClass(className: string) {
 		const draft = `.${className} {\n\n}`;
-
-		return this.insert(this.format(draft), insertOptions);
+		return this.insert(this.format(draft));
 	}
 }
 

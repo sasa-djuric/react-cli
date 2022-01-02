@@ -9,9 +9,6 @@ import { handlePathCheck } from '../../utils/path';
 import { merge } from '../../utils/object';
 import FilePath from '../../file-path';
 
-// Buidlers
-import JSTemplateBuilder from '../../builders/js-template.builder';
-
 // Configuration
 import { getSourcePath, loadScopeConfiguration, StyleConfig } from '../../configuration';
 
