@@ -1,4 +1,5 @@
 import j from 'jscodeshift';
+import casing from 'case';
 import BaseTemplate from '../base.template';
 import { StorybookConfig } from '../../configuration';
 import { toImportPath } from '../../utils/path';
@@ -10,7 +11,8 @@ class StoryBookTemplate extends BaseTemplate {
 		private componentName: string,
 		private importPath: string,
 		private config: StorybookConfig,
-		private componentDefaultImport: boolean
+		private componentDefaultImport: boolean,
+		private componentType: string
 	) {
 		super();
 	}
@@ -52,7 +54,11 @@ class StoryBookTemplate extends BaseTemplate {
 		);
 
 		const metaObject = j.objectExpression([
-			j.objectProperty(j.identifier('title'), j.literal(this.componentName)),
+			j.objectProperty(
+				j.identifier('title'),
+				j.literal(`${casing.pascal(this.componentType)}/${this.componentName}`)
+			),
+			j.objectProperty(j.identifier('component'), j.identifier(this.componentName)),
 		]);
 
 		if (this.config.typescript) {

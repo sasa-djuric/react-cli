@@ -27,6 +27,7 @@ export interface StorybookInputs {
 	name?: string;
 	componentName: string;
 	componentDefaultImport: boolean;
+	componentType: string;
 	filePath: string;
 	nameTypes?: Dictionary<string>;
 	postfixTypes?: Dictionary<string>;
@@ -63,7 +64,8 @@ class CreateStoryAction extends BaseAction {
 			inputs!.componentName,
 			fixRelativePath(relativeImportPath),
 			config,
-			inputs?.componentDefaultImport
+			inputs?.componentDefaultImport,
+			inputs.componentType === 'default' ? 'components' : inputs.componentType
 		).build();
 
 		await handlePathCheck(filePath.dir);

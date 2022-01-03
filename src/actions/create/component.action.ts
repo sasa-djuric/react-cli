@@ -121,6 +121,7 @@ class CreateComponentAction extends BaseAction {
 				filePath: path.full,
 				componentName: componentName,
 				componentDefaultImport: config.defaultExport,
+				componentType: inputs.type,
 				nameTypes: { '{name}': path.namePreferred },
 				configOverride: config.override?.storybook,
 			};
