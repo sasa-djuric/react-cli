@@ -37,16 +37,16 @@ export function doesGlobalExist() {
 	}
 }
 
-function _loadGlobal(): Config {
+function loadGlobal(): Config {
 	return JSON.parse(fs.readFileSync(globalPath, { encoding: 'utf8' }));
 }
 
-function _loadLocal(): Config {
+function loadLocal(): Config {
 	const localPath = path.resolve(getProjectRoot(), fileName);
 	return JSON.parse(fs.readFileSync(localPath, { encoding: 'utf8' }));
 }
 
-function _handleMerge(config: Config): Config {
+function handleMerge(config: Config): Config {
 	const mergeConfig = omit(config.project, ['path']);
 
 	return {
@@ -71,11 +71,11 @@ export function loadConfiguration(): Config {
 	if (config) {
 		return config;
 	} else if (doesLocalExist()) {
-		config = _handleMerge(_loadLocal());
+		config = handleMerge(loadLocal());
 	} else if (doesGlobalExist()) {
-		config = _handleMerge(_loadGlobal());
+		config = handleMerge(loadGlobal());
 	} else {
-		config = _handleMerge(defaultConfiguration as Config);
+		config = handleMerge(defaultConfiguration as Config);
 	}
 
 	return config;
