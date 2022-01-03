@@ -13,16 +13,18 @@ class PropTypesTemplate extends BaseTemplate {
 		const lastExportDeclaration = root.find(j.ExportNamedDeclaration).at(-1);
 		const lastClassDeclaration = root.find(j.ClassDeclaration).at(-1);
 		const lastVariableDeclaration = root.find(j.VariableDeclaration).at(-1);
+		const lastImportDeclaration = root.find(j.ImportDeclaration).at(-1);
 
-		root.find(j.ImportDeclaration)
-			.at(-1)
-			.get()
-			.insertAfter(
-				j.importDeclaration(
-					[j.importDefaultSpecifier(j.identifier('PropTypes'))],
-					j.literal('prop-types')
-				)
-			);
+		const importDeclaration = j.importDeclaration(
+			[j.importDefaultSpecifier(j.identifier('PropTypes'))],
+			j.literal('prop-types')
+		);
+
+		if (lastImportDeclaration.paths().length) {
+			lastImportDeclaration.get().insertAfter();
+		} else {
+			root.get().value.program.body.unshift(importDeclaration);
+		}
 
 		const propTypesExpression = j.expressionStatement(
 			j.assignmentExpression(

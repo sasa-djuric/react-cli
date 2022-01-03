@@ -16,18 +16,19 @@ class CSSStyleTypeTemplate extends BaseStyleTypeTemplate {
 
 	include(template: string, name: string, importPath: string) {
 		const root = j(template, { parser });
+		const lastImportDeclaration = root.find(j.ImportDeclaration).at(-1);
 		const className = casing.kebab(name);
 
-		root.find(j.ImportDeclaration)
-			.at(-1)
-			.insertAfter(
-				j.importDeclaration(
-					this.config.modules
-						? [j.importDefaultSpecifier(j.identifier('styles'))]
-						: [],
-					j.literal(toImportPath(importPath))
-				)
-			);
+		const importDeclaration = j.importDeclaration(
+			this.config.modules ? [j.importDefaultSpecifier(j.identifier('styles'))] : [],
+			j.literal(toImportPath(importPath))
+		);
+
+		if (lastImportDeclaration.paths().length) {
+			lastImportDeclaration.insertAfter(importDeclaration);
+		} else {
+			root.get().value.program.body.unshift(importDeclaration);
+		}
 
 		const jsxElement: JSXElement = root.findJSXElements().at(0).get().value;
 

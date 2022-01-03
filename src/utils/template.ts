@@ -49,7 +49,7 @@ export function formatTemplate(source: string) {
 			'};'
 		),
 		'\n}\n'
-	);
+	).trim();
 }
 
 export function constructTemplate(body: Array<any>) {

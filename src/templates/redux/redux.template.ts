@@ -9,13 +9,18 @@ class ReduxTemplate extends BaseTemplate {
 
 	include(template: string, typescript: boolean) {
 		const root = j(template, { parser });
+		const lastImportDeclaration = root.find(j.ImportDeclaration).at(-1);
 
-		root.find(j.ImportDeclaration).insertAfter(
-			j.importDeclaration(
-				[j.importSpecifier(j.identifier('connect'))],
-				j.literal('react-redux')
-			)
+		const importDeclaration = j.importDeclaration(
+			[j.importSpecifier(j.identifier('connect'))],
+			j.literal('react-redux')
 		);
+
+		if (lastImportDeclaration.paths().length) {
+			lastImportDeclaration.insertAfter(importDeclaration);
+		} else {
+			root.get().value.program.body.unshift(importDeclaration);
+		}
 
 		const stateIdentifier = j.identifier('state');
 		const mapStateDeclaration = j.variableDeclaration('const', [

@@ -19,6 +19,7 @@ export interface BaseConfig {
 	fileNaming: FileNamingConfig;
 	inFolder: boolean;
 }
+
 export interface ProjectConfig {
 	path: string;
 	typescript: boolean;

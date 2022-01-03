@@ -40,16 +40,19 @@ class JSStyleTypeTemplate extends BaseStyleTypeTemplate {
 
 	include(template: string, name: string, importPath: string) {
 		const root = j(template, { parser });
+		const lastImportDeclaration = root.find(j.ImportDeclaration).at(-1);
 		const elementName = `Styled${name}`;
 
-		root.find(j.ImportDeclaration)
-			.at(-1)
-			.insertAfter(
-				j.importDeclaration(
-					[j.importSpecifier(j.identifier(elementName))],
-					j.literal(removeExtension(importPath))
-				)
-			);
+		const importDeclaration = j.importDeclaration(
+			[j.importSpecifier(j.identifier(elementName))],
+			j.literal(removeExtension(importPath))
+		);
+
+		if (lastImportDeclaration.paths().length) {
+			lastImportDeclaration.insertAfter(importDeclaration);
+		} else {
+			root.get().value.program.body.unshift(importDeclaration);
+		}
 
 		const jsxElement: JSXElement = root.findJSXElements().at(0).get().value;
 
