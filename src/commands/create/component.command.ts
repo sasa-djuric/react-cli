@@ -29,6 +29,7 @@ class CreateComponentCommand extends BaseCommand {
 				'--path <destination>',
 				'Specify the path for the file relative to the project source path defined in the project configuration entry'
 			)
+			.option('-f, --inFolder', 'Create a folder for component')
 			.option('-nos, --no-style', "Don't create a style file")
 			.option('-nop, --no-proptypes', " Don't include proptypes")
 			.option('-not, --no-test', "Don't create a test file")
@@ -36,6 +37,7 @@ class CreateComponentCommand extends BaseCommand {
 			.option('-notp, --no-typescript', "Don't use typescript")
 			.option('-nor, --no-redux', "Don't include redux")
 			.option('--no-story', "Don't create story book file")
+			.option('-nof, --no-inFolder', "Don't create a folder for component")
 			.action(
 				async (
 					type: string | undefined,

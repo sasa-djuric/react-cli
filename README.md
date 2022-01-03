@@ -62,6 +62,7 @@ Options
 | --redux                            | -r                 | Include redux                                                                                                |
 | --test                             | -t                 | Create a test file                                                                                           |
 | --index                            | -i                 | Create an index file with default export                                                                     |
+| --inFolder                         | -f                 | Create a folder for component                                                                                |
 | <nobr>--file-name \<name></nobr>   | -fn                | Specify the file name. If this argument is provided, the [file naming config](#filenaming) will be ignored   |
 | <nobr>--path \<destination></nobr> | N/A                | Specify the path for the file relative to the project source path defined in the project configuration entry |
 | --no-typescript                    | <nobr>-notp</nobr> | Don't use typescript                                                                                         |
@@ -71,6 +72,7 @@ Options
 | --no-redux                         | -nor               | Don't include redux                                                                                          |
 | --no-test                          | -not               | Don't create a test file                                                                                     |
 | --no-index                         | -noi               | Don't create an index file                                                                                   |
+| --no-inFolder                      | -nof               | Don't create a folder for component                                                                          |
 
 ### <code><strong>react hook</strong></code>
 
