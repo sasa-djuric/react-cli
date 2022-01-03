@@ -7,6 +7,7 @@ import { cssStyleTypes } from '../../constants';
 // Helpers
 import { handlePathCheck } from '../../utils/path';
 import { merge } from '../../utils/object';
+import { formatTemplate } from '../../utils/template';
 import FilePath from '../../file-path';
 
 // Configuration
@@ -77,9 +78,8 @@ class CreateStyleAction extends BaseAction {
 
 		const componentFilePath = path.join(inputs.filePath, inputs.fileName);
 
-		this.update(componentFilePath, componentTemplate);
-
 		await this.create(filePath.full, template.build().toString());
+		await this.update(componentFilePath, formatTemplate(componentTemplate));
 	}
 }
 

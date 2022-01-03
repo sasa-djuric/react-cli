@@ -4,6 +4,7 @@ import path from 'path';
 // Helpers
 import { fixRelativePath, handlePathCheck, removeExtension } from '../../utils/path';
 import { merge } from '../../utils/object';
+import { formatTemplate } from '../../utils/template';
 import FilePath from '../../file-path';
 
 // Configuration
@@ -66,7 +67,7 @@ class CreateStoryAction extends BaseAction {
 		).build();
 
 		await handlePathCheck(filePath.dir);
-		await this.create(filePath.full, template.toString());
+		await this.create(filePath.full, formatTemplate(template));
 	}
 }
 

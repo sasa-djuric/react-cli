@@ -59,7 +59,7 @@ class JSStyleTypeTemplate extends BaseStyleTypeTemplate {
 			jsxElement.closingElement.name = j.jsxIdentifier(elementName);
 		}
 
-		return root.toSource();
+		return root.toSource({ lineTerminator: '\n' });
 	}
 }
 

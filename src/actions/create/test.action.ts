@@ -5,6 +5,7 @@ import path from 'path';
 import FilePath from '../../file-path';
 import { handlePathCheck, fixRelativePath, removeExtension } from '../../utils/path';
 import { merge } from '../../utils/object';
+import { formatTemplate } from '../../utils/template';
 
 // Configuration
 import { getSourcePath, loadScopeConfiguration, TestConfig } from '../../configuration';
@@ -62,7 +63,7 @@ class CreateTestAction extends BaseAction {
 		).build();
 
 		await handlePathCheck(filePath.dir);
-		await this.create(filePath.full, template.toString());
+		await this.create(filePath.full, formatTemplate(template));
 	}
 }
 

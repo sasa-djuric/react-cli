@@ -13,6 +13,7 @@ import CreateTestAction, { TestInputs } from './test.action';
 import FilePath from '../../file-path';
 import { merge } from '../../utils/object';
 import { handleFileCheck, handlePathCheck } from '../../utils/path';
+import { formatTemplate } from '../../utils/template';
 
 // Configuration
 import {
@@ -83,7 +84,7 @@ class CreateComponentAction extends BaseAction {
 			template = new PropTypesTemplate().include(template, componentName);
 		}
 
-		await this.create(path.full, template);
+		await this.create(path.full, formatTemplate(template));
 
 		if (config.style) {
 			const styleInputs: StyleInputs = {

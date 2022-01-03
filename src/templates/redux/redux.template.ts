@@ -70,7 +70,7 @@ class ReduxTemplate extends BaseTemplate {
 			lastExportDeclaration.get().insertAfter(mapDispatchDeclaration);
 		}
 
-		return root.toSource();
+		return root.toSource({ lineTerminator: '\n' });
 	}
 }
 

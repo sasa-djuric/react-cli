@@ -40,7 +40,7 @@ class CSSStyleTypeTemplate extends BaseStyleTypeTemplate {
 			)
 		);
 
-		return root.toSource();
+		return root.toSource({ lineTerminator: '\n' });
 	}
 }
 

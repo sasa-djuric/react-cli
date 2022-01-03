@@ -4,6 +4,7 @@ import path from 'path';
 // Helpers
 import { merge } from '../../utils/object';
 import { fixRelativePath, handlePathCheck, removeExtension } from '../../utils/path';
+import { formatTemplate } from '../../utils/template';
 
 // Configuration
 import { ProjectConfig, loadScopeConfiguration } from '../../configuration';
@@ -55,7 +56,7 @@ class CreateIndexAction extends BaseAction {
 		).build();
 
 		await handlePathCheck(path.parse(indexFilePath).dir);
-		await this.create(indexFilePath, template.toString());
+		await this.create(indexFilePath, formatTemplate(template));
 	}
 }
 

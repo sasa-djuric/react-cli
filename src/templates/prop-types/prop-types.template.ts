@@ -43,7 +43,7 @@ class PropTypesTemplate extends BaseTemplate {
 			lastVariableDeclaration.get().insertAfter(propTypesExpression);
 		}
 
-		return root.toSource();
+		return root.toSource({ lineTerminator: '\n' });
 	}
 }
 

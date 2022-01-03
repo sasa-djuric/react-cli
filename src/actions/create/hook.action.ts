@@ -7,6 +7,7 @@ import { merge } from 'lodash';
 // Helpers
 import FilePath from '../../file-path';
 import { handleFileCheck, handlePathCheck } from '../../utils/path';
+import { formatTemplate } from '../../utils/template';
 
 // Configuration
 import { getSourcePath, loadScopeConfiguration } from '../../configuration';
@@ -54,7 +55,7 @@ class CreateHookAction extends BaseAction {
 
 		const template = new HookTemplate(casing.camel(name), config).build();
 
-		await this.create(filePath.full, template.toString());
+		await this.create(filePath.full, formatTemplate(template));
 
 		if (config.open) {
 			exec(filePath.full);
