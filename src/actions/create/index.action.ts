@@ -1,4 +1,5 @@
 // Libs
+import fs from 'fs/promises';
 import path from 'path';
 
 // Helpers
@@ -50,13 +51,24 @@ class CreateIndexAction extends BaseAction {
 			)
 		);
 
-		const template = new IndexTemplate(
-			fixRelativePath(relativeImportPath),
-			inputs?.export!
-		).build();
+		try {
+			const source = await fs.readFile(indexFilePath, 'utf-8');
 
-		await handlePathCheck(path.parse(indexFilePath).dir);
-		await this.create(indexFilePath, formatTemplate(template));
+			const template = new IndexTemplate(
+				fixRelativePath(relativeImportPath),
+				inputs?.export!
+			).include(source);
+
+			await this.update(indexFilePath, formatTemplate(template));
+		} catch {
+			const template = new IndexTemplate(
+				fixRelativePath(relativeImportPath),
+				inputs?.export!
+			).build();
+
+			await handlePathCheck(path.parse(indexFilePath).dir);
+			await this.create(indexFilePath, formatTemplate(template));
+		}
 	}
 }
 
