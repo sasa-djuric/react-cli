@@ -24,11 +24,8 @@ class HookTemplate extends BaseTemplate {
 		]);
 
 		if (this.config.defaultExport) {
-			body.push(
-				j.exportDefaultDeclaration(
-					j.arrowFunctionExpression([], j.blockStatement([]))
-				)
-			);
+			body.push(hook);
+			body.push(j.exportDeclaration(true, j.identifier(this.name)));
 		} else {
 			body.push(j.exportDeclaration(false, hook));
 		}
