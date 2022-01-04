@@ -75,7 +75,7 @@ function onException(ex: Error) {
 	const commands = new Commands();
 
 	await checkConfiguration();
-	await checkForUpdate(packageJson.version);
+	checkForUpdate(packageJson.version);
 
 	program.version(packageJson.version).description('React CLI');
 	commands.add(new InitCommand(new InitAction()));
