@@ -18,7 +18,11 @@ export function removeSpaceBetweenImports(source: string, isFirst = true): strin
 	);
 }
 
-export function addNewLines(source: string, afterString: string): string {
+export function addNewLines(
+	source: string,
+	afterString: string,
+	afterStringLength: number = afterString.length
+): string {
 	const afterStringIndex = source.indexOf(afterString);
 
 	if (afterStringIndex === -1) {
@@ -26,16 +30,16 @@ export function addNewLines(source: string, afterString: string): string {
 	}
 
 	const draft = !source
-		.substring(afterStringIndex + afterString.length)
+		.substring(afterStringIndex + afterStringLength)
 		.startsWith('\n\n')
-		? source.substring(0, afterStringIndex + afterString.length) +
+		? source.substring(0, afterStringIndex + afterStringLength) +
 		  '\n' +
-		  source.substring(afterStringIndex + afterString.length)
+		  source.substring(afterStringIndex + afterStringLength)
 		: source;
 
 	return (
-		draft.substring(0, afterStringIndex + afterString.length) +
-		addNewLines(draft.substring(afterStringIndex + afterString.length), afterString)
+		draft.substring(0, afterStringIndex + afterStringLength) +
+		addNewLines(draft.substring(afterStringIndex + afterStringLength), afterString)
 	);
 }
 
@@ -48,7 +52,8 @@ export function formatTemplate(source: string) {
 			),
 			'};'
 		),
-		'\n}\n'
+		'\n}\n',
+		2
 	).trim();
 }
 
