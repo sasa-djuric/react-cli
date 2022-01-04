@@ -1,16 +1,14 @@
-export type cssStyleType = 'css' | 'sass' | 'scss' | 'less';
-export type jsStyleType = 'styled-components';
-export type styleType = cssStyleType | jsStyleType;
-export type projectType = 'cra' | 'next' | 'gatsby';
-export type testingLib = 'enzyme' | 'react-testing';
-export type casing = 'kebab' | 'snake' | 'camel' | 'pascal';
-export type scope = 'global' | 'project';
+export type CSSStyleType = 'css' | 'sass' | 'scss' | 'less';
+export type JSStyleType = 'styled-components';
+export type StyleType = CSSStyleType | JSStyleType;
+export type Casing = 'kebab' | 'snake' | 'camel' | 'pascal';
+export type Scope = 'global' | 'project';
 
 export interface FileNamingConfig {
 	name: string;
 	postfix: any;
 	postfixDevider: string;
-	casing: casing;
+	casing: Casing;
 }
 
 export interface BaseConfig {
@@ -48,7 +46,7 @@ export interface ComponentConfig extends BaseConfig {
 }
 
 export interface StyleConfig extends BaseConfig {
-	type: styleType;
+	type: StyleType;
 	modules: boolean;
 }
 

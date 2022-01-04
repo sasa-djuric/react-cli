@@ -9,7 +9,7 @@ import { cssStyleTypes, styleTypes } from '../constants';
 import { createConfigurationFile } from '../configuration';
 
 // Types
-import { scope } from '../configuration';
+import { Scope } from '../configuration';
 
 // Helpers
 import BaseAction from './base.action';
@@ -54,7 +54,7 @@ class InitAction extends BaseAction {
 	}
 }
 
-const project = (scope: scope) =>
+const project = (scope: Scope) =>
 	inquirer
 		.prompt([
 			{
@@ -102,7 +102,7 @@ const project = (scope: scope) =>
 			return result;
 		});
 
-const component = (scope: scope) =>
+const component = (scope: Scope) =>
 	inquirer
 		.prompt([
 			{ type: 'confirm', name: 'style', message: 'Create style file?' },
@@ -198,7 +198,7 @@ const component = (scope: scope) =>
 			return config;
 		});
 
-const style = (scope: scope) =>
+const style = (scope: Scope) =>
 	inquirer
 		.prompt([
 			{

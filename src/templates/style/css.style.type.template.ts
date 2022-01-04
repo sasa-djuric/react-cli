@@ -2,13 +2,13 @@ import j, { JSXElement } from 'jscodeshift';
 import casing from 'case';
 import BaseStyleTypeTemplate from './base.style.type.template';
 import CSSTemplateBuilder from '../../builders/css-template.builder';
-import { cssStyleType } from '../../configuration';
+import { CSSStyleType } from '../../configuration';
 import { parser } from '../../parser';
 import { toImportPath } from '../../utils/path';
 
 class CSSStyleTypeTemplate extends BaseStyleTypeTemplate {
 	build() {
-		const template = new CSSTemplateBuilder(this.config.type as cssStyleType);
+		const template = new CSSTemplateBuilder(this.config.type as CSSStyleType);
 		const className = casing.kebab(this.name);
 		template.insertClass(className);
 		return template.toString();

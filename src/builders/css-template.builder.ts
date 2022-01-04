@@ -1,8 +1,8 @@
-import { cssStyleType } from '../configuration';
+import { CSSStyleType } from '../configuration';
 import TemplateBuilder from './base-template.builder';
 
 class CSSTemplateBuilder extends TemplateBuilder {
-	constructor(private type: cssStyleType) {
+	constructor(private type: CSSStyleType) {
 		super('css');
 	}
 
