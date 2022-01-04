@@ -45,14 +45,17 @@ class ComponentTemplate extends BaseTemplate {
 		}
 
 		if (this.config.typescript) {
-			body.push(
-				'\n',
-				j.interfaceDeclaration(
-					j.identifier(propsInterfaceName),
-					j.objectTypeAnnotation([]),
-					[]
-				)
+			const interfaceDeclaration = j.interfaceDeclaration(
+				j.identifier(propsInterfaceName),
+				j.objectTypeAnnotation([]),
+				[]
 			);
+
+			if (this.config.story) {
+				body.push(j.exportDeclaration(false, interfaceDeclaration));
+			} else {
+				body.push(interfaceDeclaration);
+			}
 		}
 
 		const componentIdentifier = j.identifier(this.name);

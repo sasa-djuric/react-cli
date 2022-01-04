@@ -46,9 +46,19 @@ class StoryBookTemplate extends BaseTemplate {
 			? j.importDefaultSpecifier
 			: j.importSpecifier;
 
+		const importSpecifiers = [
+			componentImportSpecifier(j.identifier(this.componentName)),
+		];
+
+		if (this.config.typescript) {
+			importSpecifiers.push(
+				j.importSpecifier(j.identifier(`${this.componentName}Props`))
+			);
+		}
+
 		body.push(
 			j.importDeclaration(
-				[componentImportSpecifier(j.identifier(this.componentName))],
+				importSpecifiers,
 				j.literal(toImportPath(this.importPath))
 			)
 		);
@@ -75,7 +85,15 @@ class StoryBookTemplate extends BaseTemplate {
 
 		if (this.config.typescript) {
 			templateComponentIdentifier.typeAnnotation = j.typeAnnotation(
-				j.genericTypeAnnotation(j.identifier('Story'), null)
+				j.genericTypeAnnotation(
+					j.identifier('Story'),
+					j.typeParameterInstantiation([
+						j.genericTypeAnnotation(
+							j.identifier(`${this.componentName}Props`),
+							null
+						),
+					])
+				)
 			);
 		}
 
