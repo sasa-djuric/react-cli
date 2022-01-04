@@ -21,7 +21,7 @@ class PropTypesTemplate extends BaseTemplate {
 		);
 
 		if (lastImportDeclaration.paths().length) {
-			lastImportDeclaration.get().insertAfter();
+			lastImportDeclaration.get().insertAfter(importDeclaration);
 		} else {
 			root.get().value.program.body.unshift(importDeclaration);
 		}
