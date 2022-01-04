@@ -45,7 +45,7 @@ class CreateTestAction extends BaseAction {
 			pathTypes: { '{componentPath}': path.parse(inputs!.filePath).dir },
 			postfixTypes: inputs!.postfixTypes,
 			sourcePath: getSourcePath(),
-			fileExtension: config.typescript ? 'ts' : 'js',
+			fileExtension: config.typescript ? 'tsx' : 'jsx',
 		});
 
 		const relativeImportPath = removeExtension(
