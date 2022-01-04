@@ -1,4 +1,5 @@
-import j from 'jscodeshift';
+import j, { Collection, ExpressionStatement, ImportDeclaration } from 'jscodeshift';
+import { DeclarationKind } from 'ast-types/gen/kinds';
 
 export function removeSpaceBetweenImports(source: string, isFirst = true): string {
 	const importIndex = source.indexOf('import');
@@ -61,4 +62,45 @@ export function constructTemplate(body: Array<any>) {
 	const template = j('');
 	template.get().value.program.body = body;
 	return template.toSource({ lineTerminator: '\n' });
+}
+
+export function insertAfterComponentDeclaration(
+	root: Collection<any>,
+	expression: ExpressionStatement | DeclarationKind
+) {
+	const lastExportDeclaration = root.find(j.ExportNamedDeclaration).at(-1);
+	const lastClassDeclaration = root.find(j.ClassDeclaration).at(-1);
+	const lastVariableDeclaration = root.find(j.VariableDeclaration).at(-1);
+
+	if (lastClassDeclaration.paths().length) {
+		if (
+			lastClassDeclaration.get().parent.get().value.type ===
+			'ExportNamedDeclaration'
+		) {
+			lastClassDeclaration.get().parent.get().insertAfter(expression);
+		} else {
+			lastClassDeclaration.get().insertAfter(expression);
+		}
+	} else if (lastVariableDeclaration.paths().length) {
+		if (
+			lastVariableDeclaration.get().parent.get().value.type ===
+			'ExportNamedDeclaration'
+		) {
+			lastVariableDeclaration.get().parent.get().insertAfter(expression);
+		} else {
+			lastVariableDeclaration.get().insertAfter(expression);
+		}
+	} else if (lastExportDeclaration.paths().length) {
+		lastExportDeclaration.get().insertAfter(expression);
+	}
+}
+
+export function addImport(root: Collection<any>, declaration: ImportDeclaration) {
+	const lastImportDeclaration = root.find(j.ImportDeclaration).at(-1);
+
+	if (lastImportDeclaration.paths().length) {
+		lastImportDeclaration.get().insertAfter(declaration);
+	} else {
+		root.get().value.program.body.unshift(declaration);
+	}
 }

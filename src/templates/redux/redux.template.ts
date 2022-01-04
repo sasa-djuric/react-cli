@@ -1,6 +1,7 @@
 import j from 'jscodeshift';
 import BaseTemplate from '../base.template';
 import { parser } from '../../parser';
+import { addImport, insertAfterComponentDeclaration } from '../../utils/template';
 
 class ReduxTemplate extends BaseTemplate {
 	build(): string {
@@ -9,18 +10,14 @@ class ReduxTemplate extends BaseTemplate {
 
 	include(template: string, typescript: boolean) {
 		const root = j(template, { parser });
-		const lastImportDeclaration = root.find(j.ImportDeclaration).at(-1);
 
-		const importDeclaration = j.importDeclaration(
-			[j.importSpecifier(j.identifier('connect'))],
-			j.literal('react-redux')
+		addImport(
+			root,
+			j.importDeclaration(
+				[j.importSpecifier(j.identifier('connect'))],
+				j.literal('react-redux')
+			)
 		);
-
-		if (lastImportDeclaration.paths().length) {
-			lastImportDeclaration.insertAfter(importDeclaration);
-		} else {
-			root.get().value.program.body.unshift(importDeclaration);
-		}
 
 		const stateIdentifier = j.identifier('state');
 		const mapStateDeclaration = j.variableDeclaration('const', [
@@ -45,7 +42,6 @@ class ReduxTemplate extends BaseTemplate {
 
 		const defaultExportSpecifier = root.find(j.ExportDefaultDeclaration).at(0);
 		const arrowFunction = root.find(j.ArrowFunctionExpression).at(0);
-		const lastExportDeclaration = root.find(j.ExportNamedDeclaration).at(-1);
 
 		if (defaultExportSpecifier.paths().length) {
 			defaultExportSpecifier.get().value.declaration = j.callExpression(
@@ -67,13 +63,8 @@ class ReduxTemplate extends BaseTemplate {
 			);
 		}
 
-		if (defaultExportSpecifier.paths().length) {
-			defaultExportSpecifier.get().insertBefore(mapStateDeclaration);
-			defaultExportSpecifier.get().insertBefore(mapDispatchDeclaration);
-		} else {
-			lastExportDeclaration.get().insertAfter(mapStateDeclaration);
-			lastExportDeclaration.get().insertAfter(mapDispatchDeclaration);
-		}
+		insertAfterComponentDeclaration(root, mapStateDeclaration);
+		insertAfterComponentDeclaration(root, mapDispatchDeclaration);
 
 		return root.toSource({ lineTerminator: '\n' });
 	}

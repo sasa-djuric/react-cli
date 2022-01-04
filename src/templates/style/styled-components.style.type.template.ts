@@ -1,7 +1,7 @@
 import j, { JSXElement } from 'jscodeshift';
 import BaseStyleTypeTemplate from './base.style.type.template';
 import { removeExtension } from '../../utils/path';
-import { constructTemplate } from '../../utils/template';
+import { addImport, constructTemplate } from '../../utils/template';
 import { parser } from '../../parser';
 
 class JSStyleTypeTemplate extends BaseStyleTypeTemplate {
@@ -40,19 +40,15 @@ class JSStyleTypeTemplate extends BaseStyleTypeTemplate {
 
 	include(template: string, name: string, importPath: string) {
 		const root = j(template, { parser });
-		const lastImportDeclaration = root.find(j.ImportDeclaration).at(-1);
 		const elementName = `Styled${name}`;
 
-		const importDeclaration = j.importDeclaration(
-			[j.importSpecifier(j.identifier(elementName))],
-			j.literal(removeExtension(importPath))
+		addImport(
+			root,
+			j.importDeclaration(
+				[j.importSpecifier(j.identifier(elementName))],
+				j.literal(removeExtension(importPath))
+			)
 		);
-
-		if (lastImportDeclaration.paths().length) {
-			lastImportDeclaration.insertAfter(importDeclaration);
-		} else {
-			root.get().value.program.body.unshift(importDeclaration);
-		}
 
 		const jsxElement: JSXElement = root.findJSXElements().at(0).get().value;
 

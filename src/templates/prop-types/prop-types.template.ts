@@ -1,6 +1,7 @@
 import j from 'jscodeshift';
 import BaseTemplate from '../base.template';
 import { parser } from '../../parser';
+import { addImport, insertAfterComponentDeclaration } from '../../utils/template';
 
 class PropTypesTemplate extends BaseTemplate {
 	build(): string {
@@ -10,40 +11,27 @@ class PropTypesTemplate extends BaseTemplate {
 	include(template: string, componentName: string) {
 		const root = j(template, { parser });
 
-		const lastExportDeclaration = root.find(j.ExportNamedDeclaration).at(-1);
-		const lastClassDeclaration = root.find(j.ClassDeclaration).at(-1);
-		const lastVariableDeclaration = root.find(j.VariableDeclaration).at(-1);
-		const lastImportDeclaration = root.find(j.ImportDeclaration).at(-1);
-
-		const importDeclaration = j.importDeclaration(
-			[j.importDefaultSpecifier(j.identifier('PropTypes'))],
-			j.literal('prop-types')
-		);
-
-		if (lastImportDeclaration.paths().length) {
-			lastImportDeclaration.get().insertAfter(importDeclaration);
-		} else {
-			root.get().value.program.body.unshift(importDeclaration);
-		}
-
-		const propTypesExpression = j.expressionStatement(
-			j.assignmentExpression(
-				'=',
-				j.memberExpression(
-					j.identifier(componentName),
-					j.identifier('propTypes')
-				),
-				j.objectExpression([])
+		addImport(
+			root,
+			j.importDeclaration(
+				[j.importDefaultSpecifier(j.identifier('PropTypes'))],
+				j.literal('prop-types')
 			)
 		);
 
-		if (lastExportDeclaration.paths().length) {
-			lastExportDeclaration.get().insertAfter(propTypesExpression);
-		} else if (lastClassDeclaration.paths().length) {
-			lastClassDeclaration.get().insertAfter(propTypesExpression);
-		} else {
-			lastVariableDeclaration.get().insertAfter(propTypesExpression);
-		}
+		insertAfterComponentDeclaration(
+			root,
+			j.expressionStatement(
+				j.assignmentExpression(
+					'=',
+					j.memberExpression(
+						j.identifier(componentName),
+						j.identifier('propTypes')
+					),
+					j.objectExpression([])
+				)
+			)
+		);
 
 		return root.toSource({ lineTerminator: '\n' });
 	}
