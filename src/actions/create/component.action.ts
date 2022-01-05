@@ -53,7 +53,6 @@ class CreateComponentAction extends BaseAction {
 		const scopeConfig = loadScopeConfiguration('component')[inputs.type];
 		const config = merge({ ...options }, scopeConfig) as ComponentConfig;
 		const compnentTypePostfix = inputs.type === 'default' ? 'component' : inputs.type;
-		const componentName = casing.pascal(inputs.name);
 
 		const path = new FilePath({
 			name: inputs.name,
@@ -66,6 +65,8 @@ class CreateComponentAction extends BaseAction {
 			},
 			fileExtension: config.typescript ? 'tsx' : 'jsx',
 		});
+
+		const componentName = casing.pascal(path.name);
 
 		let template = new ComponentTemplate(componentName, config).build();
 
