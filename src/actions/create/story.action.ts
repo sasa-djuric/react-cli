@@ -65,7 +65,7 @@ class CreateStoryAction extends BaseAction {
 			fixRelativePath(relativeImportPath),
 			config,
 			inputs?.componentDefaultImport,
-			inputs.componentType === 'default' ? 'components' : inputs.componentType
+			inputs.componentType === 'default' ? 'component' : inputs.componentType
 		).build();
 
 		await handlePathCheck(filePath.dir);

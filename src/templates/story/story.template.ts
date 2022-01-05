@@ -66,7 +66,7 @@ class StoryBookTemplate extends BaseTemplate {
 		const metaObject = j.objectExpression([
 			j.objectProperty(
 				j.identifier('title'),
-				j.literal(`${casing.pascal(this.componentType)}/${this.componentName}`)
+				j.literal(`${casing.pascal(this.componentType)}s/${this.componentName}`)
 			),
 			j.objectProperty(j.identifier('component'), j.identifier(this.componentName)),
 		]);
