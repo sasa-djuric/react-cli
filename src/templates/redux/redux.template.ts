@@ -1,7 +1,7 @@
 import j from 'jscodeshift';
 import BaseTemplate from '../base.template';
 import { parser } from '../../parser';
-import { addImport, insertAfterComponentDeclaration } from '../../utils/template';
+import { addImport, findRootNode } from '../../utils/template';
 
 class ReduxTemplate extends BaseTemplate {
 	build(): string {
@@ -44,6 +44,13 @@ class ReduxTemplate extends BaseTemplate {
 		const arrowFunction = root.find(j.ArrowFunctionExpression).at(0);
 
 		if (defaultExportSpecifier.paths().length) {
+			findRootNode(root.findJSXElements().at(0).get()).insertAfter(
+				mapStateDeclaration
+			);
+			findRootNode(root.findJSXElements().at(0).get()).insertAfter(
+				mapDispatchDeclaration
+			);
+
 			defaultExportSpecifier.get().value.declaration = j.callExpression(
 				j.callExpression(j.identifier('connect'), [
 					j.identifier('mapStateToProps'),
@@ -52,6 +59,13 @@ class ReduxTemplate extends BaseTemplate {
 				[j.identifier(defaultExportSpecifier.get().value.declaration.name)]
 			);
 		} else if (arrowFunction.paths().length) {
+			findRootNode(root.findJSXElements().at(0).get()).insertBefore(
+				mapStateDeclaration
+			);
+			findRootNode(root.findJSXElements().at(0).get()).insertBefore(
+				mapDispatchDeclaration
+			);
+
 			arrowFunction.replaceWith(
 				j.callExpression(
 					j.callExpression(j.identifier('connect'), [
@@ -62,9 +76,6 @@ class ReduxTemplate extends BaseTemplate {
 				)
 			);
 		}
-
-		insertAfterComponentDeclaration(root, mapStateDeclaration);
-		insertAfterComponentDeclaration(root, mapDispatchDeclaration);
 
 		return root.toSource({ lineTerminator: '\n' });
 	}
