@@ -1,7 +1,7 @@
 import j from 'jscodeshift';
 import BaseTemplate from '../base.template';
 import { parser } from '../../parser';
-import { addImport, insertAfterComponentDeclaration } from '../../utils/template';
+import { addImport, findRootNode } from '../../utils/template';
 
 class PropTypesTemplate extends BaseTemplate {
 	build(): string {
@@ -19,8 +19,7 @@ class PropTypesTemplate extends BaseTemplate {
 			)
 		);
 
-		insertAfterComponentDeclaration(
-			root,
+		findRootNode(root.findJSXElements().at(0).get()).insertAfter(
 			j.expressionStatement(
 				j.assignmentExpression(
 					'=',

@@ -64,37 +64,6 @@ export function constructTemplate(body: Array<any>) {
 	return template.toSource({ lineTerminator: '\n' });
 }
 
-export function insertAfterComponentDeclaration(
-	root: Collection<any>,
-	expression: ExpressionStatement | DeclarationKind
-) {
-	const lastExportDeclaration = root.find(j.ExportNamedDeclaration).at(-1);
-	const lastClassDeclaration = root.find(j.ClassDeclaration).at(-1);
-	const lastVariableDeclaration = root.find(j.VariableDeclaration).at(-1);
-
-	if (lastClassDeclaration.paths().length) {
-		if (
-			lastClassDeclaration.get().parent.get().value.type ===
-			'ExportNamedDeclaration'
-		) {
-			lastClassDeclaration.get().parent.get().insertAfter(expression);
-		} else {
-			lastClassDeclaration.get().insertAfter(expression);
-		}
-	} else if (lastVariableDeclaration.paths().length) {
-		if (
-			lastVariableDeclaration.get().parent.get().value.type ===
-			'ExportNamedDeclaration'
-		) {
-			lastVariableDeclaration.get().parent.get().insertAfter(expression);
-		} else {
-			lastVariableDeclaration.get().insertAfter(expression);
-		}
-	} else if (lastExportDeclaration.paths().length) {
-		lastExportDeclaration.get().insertAfter(expression);
-	}
-}
-
 export function addImport(root: Collection<any>, declaration: ImportDeclaration) {
 	const lastImportDeclaration = root.find(j.ImportDeclaration).at(-1);
 
@@ -102,5 +71,15 @@ export function addImport(root: Collection<any>, declaration: ImportDeclaration)
 		lastImportDeclaration.get().insertAfter(declaration);
 	} else {
 		root.get().value.program.body.unshift(declaration);
+	}
+}
+
+export function findRootNode(node: any): Collection<any> {
+	const parent = node.parent.get();
+
+	if (parent.value.type === 'Program') {
+		return node;
+	} else {
+		return findRootNode(parent);
 	}
 }
