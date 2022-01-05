@@ -78,7 +78,7 @@ class CreateStyleAction extends BaseAction {
 
 		const componentFilePath = path.join(inputs.filePath, inputs.fileName);
 
-		await this.create(filePath.full, template.build().toString());
+		await this.create(filePath.full, formatTemplate(template.build()));
 		await this.update(componentFilePath, formatTemplate(componentTemplate));
 	}
 }

@@ -48,12 +48,16 @@ export function formatTemplate(source: string) {
 	return addNewLines(
 		addNewLines(
 			addNewLines(
-				removeSpaceBetweenImports(source.replace(/\n\s*\n\s*\n/g, '\n\n')),
-				'\n});'
+				addNewLines(
+					removeSpaceBetweenImports(source.replace(/\n\s*\n\s*\n/g, '\n\n')),
+					'\n});'
+				),
+				'};'
 			),
-			'};'
+			'\n}\n',
+			2
 		),
-		'\n}\n',
+		'{}\n',
 		2
 	).trim();
 }
