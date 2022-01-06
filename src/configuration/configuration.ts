@@ -61,6 +61,16 @@ export interface HookConfig extends BaseConfig {
 	defaultExport: boolean;
 }
 
+export interface ContextConfig extends BaseConfig {
+	hook: boolean;
+	open: boolean;
+	export: {
+		destructure: boolean;
+		default: boolean;
+		inline: boolean;
+	};
+}
+
 export interface Config {
 	project: ProjectConfig;
 	component: { [componentType: string]: ComponentConfig };
@@ -68,4 +78,5 @@ export interface Config {
 	storybook: StorybookConfig;
 	test: TestConfig;
 	hook: HookConfig;
+	context: ContextConfig;
 }

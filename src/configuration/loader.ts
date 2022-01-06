@@ -64,6 +64,7 @@ function handleMerge(config: Config): Config {
 		storybook: merge(config.storybook || defaultConfiguration.storybook, mergeConfig),
 		test: merge(config.test || defaultConfiguration.test, mergeConfig),
 		hook: merge(config.hook || defaultConfiguration.hook, mergeConfig),
+		context: merge(config.context || defaultConfiguration.context, mergeConfig),
 	};
 }
 

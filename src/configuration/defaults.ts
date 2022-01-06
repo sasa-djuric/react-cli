@@ -61,4 +61,17 @@ export const defaultConfiguration: DeepPartial<Config> = Object.freeze({
 			casing: 'camel',
 		},
 	},
+	context: {
+		path: '/contexts',
+		export: {
+			default: false,
+			destructure: true,
+			inline: false,
+		},
+		hook: true,
+		open: true,
+		fileNaming: {
+			casing: 'camel',
+		},
+	},
 });

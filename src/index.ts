@@ -17,12 +17,14 @@ import { shouldCreateConfig } from './utils/configuration';
 import InitAction from './actions/init.action';
 import CreateComponentAction from './actions/create/component.action';
 import CreateHookAction from './actions/create/hook.action';
+import CreateContextAction from './actions/create/context.action';
 
 // Commands
 import Commands from './commands';
 import InitCommand from './commands/init.command';
 import CreateComponentCommand from './commands/create/component.command';
 import CreateHookCommand from './commands/create/hook.command';
+import CreateContextCommand from './commands/create/context.command';
 
 const packageJson = require(path.resolve(settings.ROOT_PATH, 'package.json'));
 
@@ -81,6 +83,7 @@ function onException(ex: Error) {
 	commands.add(new InitCommand(new InitAction()));
 	commands.add(new CreateComponentCommand(new CreateComponentAction()));
 	commands.add(new CreateHookCommand(new CreateHookAction()));
+	commands.add(new CreateContextCommand(new CreateContextAction()));
 	commands.load(program);
 	program.parse(process.argv);
 })();
