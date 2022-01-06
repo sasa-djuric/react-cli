@@ -92,6 +92,28 @@ Options
 | --no-typescript                    | <nobr>-notp</nobr> | Don't use typescript                                                                                         |
 | <nobr>--path \<destination></nobr> | N/A                | Specify the path for the file relative to the project source path defined in the project configuration entry |
 
+### <code><strong>react context</strong></code>
+
+Arguments
+
+| Argument | Description      |
+| -------- | ---------------- |
+| \<name>  | Name for context |
+
+</br>
+
+Options
+
+| Option                             | Alias              | Description                                                                                                  |
+| ---------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------ |
+| --typescript                       | -t                 | Use typescript                                                                                               |
+| --customProvider                   | -cp                | Use custom provider                                                                                          |
+| --hook                             | -h                 | Create hook                                                                                                  |
+| --no-typescript                    | <nobr>-notp</nobr> | Don't use typescript                                                                                         |
+| --no-customProvider                | <nobr>-nocp</nobr> | Don't use custom provider                                                                                    |
+| --no-hook                          | <nobr>-noh</nobr>  | Don't create hook                                                                                            |
+| <nobr>--path \<destination></nobr> | N/A                | Specify the path for the file relative to the project source path defined in the project configuration entry |
+
 ## Configuration
 
 The configuration file contains the next scopes (fields):
@@ -104,6 +126,7 @@ The configuration file contains the next scopes (fields):
 | storybook | <code>[StorybookConfig](#storybook)</code>       |
 | test      | <code>[TestConfig](#testconfig)</code>           |
 | hook      | <code>[HookConfig](#hookconfig)</code>           |
+| context   | <code>[ContextConfig](#contextconfig)</code>     |
 
 ### <code>ProjectConfig</code>
 
@@ -181,6 +204,18 @@ The configuration file contains the next scopes (fields):
 | typescript | <code>boolean</code>                   | Use typescript                                                                                               |
 | inFolder   | <code>boolean</code>                   | Save the file in its own folder                                                                              |
 | fileNaming | <code>[FileNaming](#filenaming)</code> | Define file naming                                                                                           |
+
+### <code>ContextConfig</code>
+
+| Option         | Type                                   | Description                                                                                                  |
+| -------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| open           | <code>boolean</code>                   | Open file in default editor after creating                                                                   |
+| path           | <code>string</code>                    | Specify the path for the file relative to the project source path defined in the project configuration entry |
+| typescript     | <code>boolean</code>                   | Use typescript                                                                                               |
+| inFolder       | <code>boolean</code>                   | Save the file in its own folder                                                                              |
+| customProvider | <code>boolean</code>                   | Create custom wrapper component around context provider                                                      |
+| hook           | <code>boolean</code>                   | Create hook inside context file for context usage                                                            |
+| fileNaming     | <code>[FileNaming](#filenaming)</code> | Define file naming                                                                                           |
 
 </br>
 
@@ -304,6 +339,23 @@ The configuration file contains the next scopes (fields):
     "hook": {
         "open": true,
         "path": "/hooks"
+    },
+    "context": {
+        "path": "/contexts",
+        "open": true,
+        "hook": true,
+        "customProvider": false,
+        "export": {
+            "destructure": false,
+            "inline": true,
+            "default": false
+        },
+        "fileNaming": {
+            "casing": "kebab",
+            "name": "{name}",
+            "postfix": "context",
+            "postfixDevider": "."
+        }
     }
 }
 ```
