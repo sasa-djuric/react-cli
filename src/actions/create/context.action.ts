@@ -28,11 +28,12 @@ interface Inputs {
 interface Options {
 	typescript: boolean;
 	path: string;
+	customProvider: boolean;
 }
 
 class CreateContextAction extends BaseAction {
 	async handle(inputs?: Inputs, options?: Options) {
-		const config = merge(options, loadScopeConfiguration('context')) as ContextConfig;
+		const config = merge(loadScopeConfiguration('context'), options) as ContextConfig;
 
 		const name = !inputs!.name.toLowerCase().endsWith('context')
 			? `${inputs!.name}Context`
@@ -40,7 +41,8 @@ class CreateContextAction extends BaseAction {
 
 		const filePath = new FilePath({
 			name: inputs?.name,
-			fileExtension: config.typescript ? 'ts' : 'js',
+			fileExtension:
+				(config.typescript ? 'ts' : 'js') + (config.customProvider ? 'x' : ''),
 			sourcePath: getSourcePath(),
 			postfixTypes: { type: 'context' },
 			config: config,

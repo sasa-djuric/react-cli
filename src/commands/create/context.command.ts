@@ -11,7 +11,11 @@ class CreateContextCommand extends BaseCommand {
 			.arguments('<name>')
 			.description('create context')
 			.option('-t, --typescript', 'Use typescript')
+			.option('-cp, --customProvider', 'Use custom provider')
+			.option('-h, --hook', 'Create a hook')
 			.option('-notp, --no-typescript', "Don't use typescript")
+			.option('-nocp, --no-customProvider', "Don't use custom provider")
+			.option('-noh, --no-hook', "Don't create a hook")
 			.option(
 				'--path',
 				'Specify the path for the file relative to the project source path defined in the project configuration entry'

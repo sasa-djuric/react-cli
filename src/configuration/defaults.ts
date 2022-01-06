@@ -65,13 +65,14 @@ export const defaultConfiguration: DeepPartial<Config> = Object.freeze({
 		path: '/contexts',
 		export: {
 			default: false,
-			destructure: true,
-			inline: false,
+			destructure: false,
+			inline: true,
 		},
 		hook: true,
 		open: true,
+		customProvider: false,
 		fileNaming: {
-			casing: 'camel',
+			casing: 'kebab',
 		},
 	},
 });
