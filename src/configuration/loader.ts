@@ -15,6 +15,8 @@ import { defaultConfiguration } from './defaults';
 import Dictionary from '../types/dictionary';
 import { ComponentConfig, Config } from './configuration';
 
+import { updateConfigurationFile } from '.';
+
 const fileName = `${settings.CONFIG_NAME}.json`;
 const globalPath = path.resolve(settings.ROOT_PATH, fileName);
 
@@ -47,7 +49,10 @@ function loadLocal(): Config {
 }
 
 function handleMerge(config: Config): Config {
-	const mergeConfig = omit(config.project, ['path']);
+	const mergeConfig = merge(
+		omit(config.project, ['path']),
+		omit(defaultConfiguration.project, ['path'])
+	);
 
 	return {
 		...config,
@@ -68,13 +73,72 @@ function handleMerge(config: Config): Config {
 	};
 }
 
+function migration(config: Config) {
+	let isModified = false;
+
+	const component = Object.entries(config.component).reduce<
+		Record<string, ComponentConfig>
+	>((acc, [componentType, typeConfig]) => {
+		acc[componentType] = typeConfig;
+
+		if (typeof (typeConfig as any).defaultExport === 'boolean') {
+			acc[componentType].export = {
+				...(acc[componentType].export || {}),
+				default: (typeConfig as any).defaultExport,
+			};
+
+			delete (acc[componentType] as any).defaultExport;
+
+			isModified = true;
+		}
+
+		return acc;
+	}, {});
+
+	const hook = {
+		...config.hook,
+	};
+
+	if (typeof (hook as any).defaultExport === 'boolean') {
+		hook.export = {
+			...(hook.export || {}),
+			default: (hook as any).defaultExport,
+		};
+
+		delete (hook as any).defaultExport;
+
+		isModified = true;
+	}
+
+	return {
+		isModified,
+		config: {
+			...config,
+			component,
+			hook,
+		},
+	};
+}
+
 export function loadConfiguration(): Config {
 	if (config) {
 		return config;
 	} else if (doesLocalExist()) {
-		config = handleMerge(loadLocal());
+		const localConfig = migration(loadLocal());
+
+		if (localConfig.isModified) {
+			updateConfigurationFile(localConfig.config, 'project');
+		}
+
+		config = handleMerge(localConfig.config);
 	} else if (doesGlobalExist()) {
-		config = handleMerge(loadGlobal());
+		const globalConfig = migration(loadGlobal());
+
+		if (globalConfig.isModified) {
+			updateConfigurationFile(globalConfig.config, 'global');
+		}
+
+		config = handleMerge(globalConfig.config);
 	} else {
 		config = handleMerge(defaultConfiguration as Config);
 	}

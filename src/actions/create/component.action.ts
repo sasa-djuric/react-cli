@@ -111,7 +111,7 @@ class CreateComponentAction extends BaseAction {
 					importName: casing.pascal(path.namePreferred),
 					path: path.full,
 				},
-				export: config.defaultExport ? 'default' : 'all',
+				export: config.export.default ? 'default' : 'all',
 			};
 
 			await new CreateIndexAction().handle(indexInputs);
@@ -121,7 +121,7 @@ class CreateComponentAction extends BaseAction {
 			const storyInputs: StorybookInputs = {
 				filePath: path.full,
 				componentName: componentName,
-				componentDefaultImport: config.defaultExport,
+				componentDefaultImport: config.export.default,
 				componentType: inputs.type,
 				nameTypes: { '{name}': path.namePreferred },
 				configOverride: config.override?.storybook,
@@ -134,7 +134,7 @@ class CreateComponentAction extends BaseAction {
 			const testInputs: TestInputs = {
 				filePath: path.full,
 				componentName: componentName,
-				componentDefaultImport: config.defaultExport,
+				componentDefaultImport: config.export.default,
 				nameTypes: { '{name}': path.namePreferred },
 				configOverride: config.override?.test,
 			};

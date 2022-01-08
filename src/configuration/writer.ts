@@ -10,7 +10,10 @@ import { getProjectRoot } from '../utils/path';
 import settings from '../settings';
 import { defaultConfiguration } from './defaults';
 
-export function createConfigurationFile(config: any, scope: 'global' | 'project') {
+// Types
+import { Scope } from './';
+
+export function createConfigurationFile(config: any, scope: Scope) {
 	try {
 		const fileName = `${settings.CONFIG_NAME}.json`;
 		const global = path.resolve(settings.ROOT_PATH, fileName);
@@ -24,4 +27,16 @@ export function createConfigurationFile(config: any, scope: 'global' | 'project'
 	} catch (ex: any) {
 		console.error(ex.message);
 	}
+}
+
+export function updateConfigurationFile(config: any, scope: Scope) {
+	const fileName = `${settings.CONFIG_NAME}.json`;
+	const global = path.resolve(settings.ROOT_PATH, fileName);
+	const local = path.resolve(getProjectRoot(), fileName);
+	const filePath = scope === 'global' ? global : local;
+
+	fs.unlinkSync(filePath);
+	fs.writeFileSync(filePath, JSON.stringify(config, null, '\t'), {
+		encoding: 'utf-8',
+	});
 }

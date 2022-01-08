@@ -14,6 +14,10 @@ export const defaultConfiguration: DeepPartial<Config> = Object.freeze({
 			postfixDevider: '.',
 			casing: 'kebab',
 		},
+		export: {
+			default: false,
+			inline: true,
+		},
 	},
 	component: {
 		default: {
@@ -25,7 +29,6 @@ export const defaultConfiguration: DeepPartial<Config> = Object.freeze({
 			redux: false,
 			index: false,
 			testId: false,
-			defaultExport: true,
 			inFolder: true,
 			open: false,
 			path: '/components',
@@ -41,6 +44,10 @@ export const defaultConfiguration: DeepPartial<Config> = Object.freeze({
 		type: 'css',
 		modules: false,
 		path: '{componentPath}',
+		export: {
+			default: false,
+			inline: true,
+		},
 	},
 	storybook: {
 		path: '{componentPath}',
@@ -56,7 +63,6 @@ export const defaultConfiguration: DeepPartial<Config> = Object.freeze({
 	},
 	hook: {
 		path: '/hooks',
-		defaultExport: false,
 		fileNaming: {
 			casing: 'camel',
 		},

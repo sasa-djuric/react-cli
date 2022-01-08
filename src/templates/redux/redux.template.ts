@@ -40,41 +40,122 @@ class ReduxTemplate extends BaseTemplate {
 			dispatchFnIdentifier.typeAnnotation = j.typeAnnotation(j.anyTypeAnnotation());
 		}
 
-		const defaultExportSpecifier = root.find(j.ExportDefaultDeclaration).at(0);
+		const componentRootElement = findRootNode(root.findJSXElements().at(0).get());
+		const componentRootElementValue = componentRootElement.get().value;
 		const arrowFunction = root.find(j.ArrowFunctionExpression).at(0);
 
-		if (defaultExportSpecifier.paths().length) {
-			findRootNode(root.findJSXElements().at(0).get()).insertAfter(
-				mapStateDeclaration
-			);
-			findRootNode(root.findJSXElements().at(0).get()).insertAfter(
-				mapDispatchDeclaration
-			);
+		if (componentRootElementValue.type === 'ExportDefaultDeclaration') {
+			if (componentRootElementValue.declaration.type === 'ClassDeclaration') {
+				componentRootElement.insertAfter(mapStateDeclaration);
+				componentRootElement.insertAfter(mapDispatchDeclaration);
 
-			defaultExportSpecifier.get().value.declaration = j.callExpression(
-				j.callExpression(j.identifier('connect'), [
-					j.identifier('mapStateToProps'),
-					j.identifier('mapDispatchToProps'),
-				]),
-				[j.identifier(defaultExportSpecifier.get().value.declaration.name)]
-			);
-		} else if (arrowFunction.paths().length) {
-			findRootNode(root.findJSXElements().at(0).get()).insertBefore(
-				mapStateDeclaration
-			);
-			findRootNode(root.findJSXElements().at(0).get()).insertBefore(
-				mapDispatchDeclaration
-			);
+				root.get().value.program.body.push(
+					j.exportDefaultDeclaration(
+						j.callExpression(
+							j.callExpression(j.identifier('connect'), [
+								j.identifier('mapStateToProps'),
+								j.identifier('mapDispatchToProps'),
+							]),
+							[componentRootElementValue.declaration.id]
+						)
+					)
+				);
 
-			arrowFunction.replaceWith(
-				j.callExpression(
-					j.callExpression(j.identifier('connect'), [
-						j.identifier('mapStateToProps'),
-						j.identifier('mapDispatchToProps'),
-					]),
-					[arrowFunction.get().value]
-				)
-			);
+				componentRootElement.get().replace(componentRootElementValue.declaration);
+			} else {
+				componentRootElement.get().insertBefore(mapStateDeclaration);
+				componentRootElement.get().insertBefore(mapDispatchDeclaration);
+
+				componentRootElement
+					.get()
+					.replace(
+						j.exportDefaultDeclaration(
+							j.callExpression(
+								j.callExpression(j.identifier('connect'), [
+									j.identifier('mapStateToProps'),
+									j.identifier('mapDispatchToProps'),
+								]),
+								[componentRootElementValue.declaration]
+							)
+						)
+					);
+			}
+		} else if (componentRootElementValue.type === 'ExportNamedDeclaration') {
+			if (componentRootElementValue.declaration.type === 'ClassDeclaration') {
+				componentRootElement.get().insertBefore(mapStateDeclaration);
+				componentRootElement.get().insertBefore(mapDispatchDeclaration);
+			} else {
+				componentRootElement.get().insertBefore(mapStateDeclaration);
+				componentRootElement.get().insertBefore(mapDispatchDeclaration);
+
+				arrowFunction.replaceWith(
+					j.callExpression(
+						j.callExpression(j.identifier('connect'), [
+							j.identifier('mapStateToProps'),
+							j.identifier('mapDispatchToProps'),
+						]),
+						[arrowFunction.get().value]
+					)
+				);
+			}
+		} else {
+			let componentIdentifier;
+
+			if (componentRootElementValue.type === 'VariableDeclaration') {
+				componentIdentifier = componentRootElementValue.declarations[0].id;
+			} else {
+				componentIdentifier = componentRootElementValue.id;
+			}
+
+			const exportNamedIdentifier = root
+				.find(j.ExportNamedDeclaration)
+				.find(j.Identifier, { name: componentIdentifier.name })
+				.at(0);
+
+			const exportDefaultIdentifier = root
+				.find(j.ExportDefaultDeclaration)
+				.find(j.Identifier, { name: componentIdentifier.name })
+				.at(0);
+
+			if (exportNamedIdentifier.paths().length) {
+				if (componentRootElementValue.type === 'VariableDeclaration') {
+					componentRootElement.get().insertBefore(mapStateDeclaration);
+					componentRootElement.get().insertBefore(mapDispatchDeclaration);
+
+					arrowFunction.replaceWith(
+						j.callExpression(
+							j.callExpression(j.identifier('connect'), [
+								j.identifier('mapStateToProps'),
+								j.identifier('mapDispatchToProps'),
+							]),
+							[arrowFunction.get().value]
+						)
+					);
+				} else {
+					const exportIdentifierRoot = findRootNode(
+						exportNamedIdentifier.get()
+					);
+					exportIdentifierRoot.get().insertBefore(mapStateDeclaration);
+					exportIdentifierRoot.get().insertBefore(mapDispatchDeclaration);
+				}
+			} else if (exportDefaultIdentifier.paths().length) {
+				const exportRoot = findRootNode(exportDefaultIdentifier.get());
+
+				exportRoot.get().insertBefore(mapStateDeclaration);
+				exportRoot.get().insertBefore(mapDispatchDeclaration);
+
+				exportDefaultIdentifier
+					.get()
+					.replace(
+						j.callExpression(
+							j.callExpression(j.identifier('connect'), [
+								j.identifier('mapStateToProps'),
+								j.identifier('mapDispatchToProps'),
+							]),
+							[j.identifier(componentIdentifier.name)]
+						)
+					);
+			}
 		}
 
 		return root.toSource({ lineTerminator: '\n' });

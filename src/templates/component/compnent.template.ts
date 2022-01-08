@@ -1,6 +1,5 @@
 // Libs
-import j, { JSXAttribute } from 'jscodeshift';
-import { DeclarationKind } from 'ast-types/gen/kinds';
+import j, { ExportSpecifier, JSXAttribute } from 'jscodeshift';
 
 // Utils
 import { getDependencyVersion, doesDependencyExists } from '../../utils/dependency';
@@ -24,7 +23,6 @@ class ComponentTemplate extends BaseTemplate {
 		const propsInterfaceName = this.name + 'Props';
 		let elementTag = isReactNative ? 'View' : 'div';
 		let elementAttributes: Array<JSXAttribute> = [];
-		let component: DeclarationKind;
 
 		if (this.config.class || !reactVersion || reactVersion < 17.01) {
 			body.push(
@@ -89,7 +87,7 @@ class ComponentTemplate extends BaseTemplate {
 		);
 
 		if (this.config.class) {
-			component = j.classDeclaration(
+			const classDeclaration = j.classDeclaration(
 				j.identifier(this.name),
 				j.classBody([
 					j.classMethod(
@@ -107,27 +105,62 @@ class ComponentTemplate extends BaseTemplate {
 			);
 
 			if (this.config.typescript) {
-				component.superTypeParameters = j.typeParameterInstantiation([
+				classDeclaration.superTypeParameters = j.typeParameterInstantiation([
 					j.genericTypeAnnotation(j.identifier(propsInterfaceName), null),
 				]);
 			}
-		} else {
-			component = j.variableDeclaration('const', [
-				j.variableDeclarator(
-					componentIdentifier,
-					j.arrowFunctionExpression(
-						[j.tsParameterProperty(j.identifier('props'))],
-						j.blockStatement([j.returnStatement(element)])
-					)
-				),
-			]);
-		}
 
-		if (this.config.defaultExport) {
-			body.push(component);
-			body.push(j.exportDeclaration(true, j.identifier(this.name)));
+			if (this.config.export.default) {
+				if (this.config.export.inline) {
+					body.push(j.exportDefaultDeclaration(classDeclaration));
+				} else {
+					body.push(classDeclaration);
+					body.push(j.exportDefaultDeclaration(j.identifier(this.name)));
+				}
+			} else {
+				if (this.config.export.inline) {
+					body.push(j.exportNamedDeclaration(classDeclaration));
+				} else {
+					const exportSpecifier: ExportSpecifier = {
+						type: 'ExportSpecifier',
+						exported: j.identifier(this.name),
+						local: j.identifier(this.name),
+					};
+
+					body.push(classDeclaration);
+					body.push(j.exportNamedDeclaration(null, [exportSpecifier]));
+				}
+			}
 		} else {
-			body.push(j.exportDeclaration(false, component));
+			const functionDeclaration = j.arrowFunctionExpression(
+				[j.tsParameterProperty(j.identifier('props'))],
+				j.blockStatement([j.returnStatement(element)])
+			);
+			const variableDeclaration = j.variableDeclaration('const', [
+				j.variableDeclarator(componentIdentifier, functionDeclaration),
+			]);
+
+			if (this.config.export.default) {
+				if (this.config.export.inline && !this.config.proptypes) {
+					body.push(j.exportDefaultDeclaration(functionDeclaration));
+				} else {
+					body.push(variableDeclaration);
+					body.push(j.exportDeclaration(true, j.identifier(this.name)));
+				}
+			} else {
+				if (this.config.export.inline) {
+					body.push(j.exportNamedDeclaration(variableDeclaration));
+				} else {
+					const exportSpecifier: ExportSpecifier = {
+						type: 'ExportSpecifier',
+						exported: j.identifier(this.name),
+						local: j.identifier(this.name),
+					};
+
+					body.push(variableDeclaration);
+					body.push(j.exportNamedDeclaration(null, [exportSpecifier]));
+				}
+			}
 		}
 
 		return constructTemplate(body);
