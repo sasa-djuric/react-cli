@@ -138,6 +138,7 @@ The configuration file contains the next scopes (fields):
 | format     | <code>boolean</code>                   | Uses prettier if it's used to format created files |
 | verbose    | <code>boolean</code>                   | Outputs operation and file path on stdout          |
 | fileNaming | <code>[FileNaming](#filenaming)</code> | Define file naming                                 |
+| export     | <code>[Export](#export)</code>         | Define export preferences                          |
 
 ### <code>ComponentConfig</code>
 
@@ -156,6 +157,7 @@ The configuration file contains the next scopes (fields):
 | typescript | <code>boolean</code>                                             | Use typescript                                                                                               |
 | inFolder   | <code>boolean</code>                                             | Save the file in its own folder                                                                              |
 | fileNaming | <code>[FileNaming](#filenaming)</code>                           | Define file naming                                                                                           |
+| export     | <code>[Export](#export)</code>                                   | Define export preferences                                                                                    |
 | override   | <code>[ComponentOverrideConfig](#componentconfigoverride)</code> | Override configuration of style, storybook, or test                                                          |
 
 #### <code>ComponentOverrideConfig</code>
@@ -176,6 +178,7 @@ The configuration file contains the next scopes (fields):
 | typescript | <code>boolean</code>                                                                                              | Use typescript (for css in js solutions)                                                                     |
 | inFolder   | <code>boolean</code>                                                                                              | Save the file in its own folder                                                                              |
 | fileNaming | <code>[FileNaming](#filenaming)</code>                                                                            | Define file naming                                                                                           |
+| export     | <code>[Export](#export)</code>                                                                                    | Define export preferences for CSS in JS styling solutions                                                    |
 
 ### <code>StorybookConfig</code>
 
@@ -204,18 +207,20 @@ The configuration file contains the next scopes (fields):
 | typescript | <code>boolean</code>                   | Use typescript                                                                                               |
 | inFolder   | <code>boolean</code>                   | Save the file in its own folder                                                                              |
 | fileNaming | <code>[FileNaming](#filenaming)</code> | Define file naming                                                                                           |
+| export     | <code>[Export](#export)</code>         | Define export preferences                                                                                    |
 
 ### <code>ContextConfig</code>
 
-| Option         | Type                                   | Description                                                                                                  |
-| -------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| open           | <code>boolean</code>                   | Open file in default editor after creating                                                                   |
-| path           | <code>string</code>                    | Specify the path for the file relative to the project source path defined in the project configuration entry |
-| typescript     | <code>boolean</code>                   | Use typescript                                                                                               |
-| inFolder       | <code>boolean</code>                   | Save the file in its own folder                                                                              |
-| customProvider | <code>boolean</code>                   | Create custom wrapper component around context provider                                                      |
-| hook           | <code>boolean</code>                   | Create hook inside context file for context usage                                                            |
-| fileNaming     | <code>[FileNaming](#filenaming)</code> | Define file naming                                                                                           |
+| Option         | Type                                                               | Description                                                                                                  |
+| -------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| open           | <code>boolean</code>                                               | Open file in default editor after creating                                                                   |
+| path           | <code>string</code>                                                | Specify the path for the file relative to the project source path defined in the project configuration entry |
+| typescript     | <code>boolean</code>                                               | Use typescript                                                                                               |
+| inFolder       | <code>boolean</code>                                               | Save the file in its own folder                                                                              |
+| customProvider | <code>boolean</code>                                               | Create custom wrapper component around context provider                                                      |
+| hook           | <code>boolean</code>                                               | Create hook inside context file for context usage                                                            |
+| fileNaming     | <code>[FileNaming](#filenaming)</code>                             | Define file naming                                                                                           |
+| export         | <code>[Export](#export)</code> & <code>destructure: boolean</code> | Define export preferences                                                                                    |
 
 </br>
 
@@ -227,6 +232,13 @@ The configuration file contains the next scopes (fields):
 | postfix        | <code>string</code>                                                                   | Define postfix or [postfix type](#postfix-type) for file name |
 | postfixDevider | <code>string</code>                                                                   | Define postfix devider                                        |
 | casing         | <code>camel</code> \| <code>pascal</code> \| <code>kebab</code> \| <code>snake</code> | Specify casing type                                           |
+
+#### <code>Export</code>
+
+| Option  | Type                 | Description                              |
+| ------- | -------------------- | ---------------------------------------- |
+| default | <code>boolean</code> | Specify export type (default or named)   |
+| inline  | <code>boolean</code> | Specify should export be declared inline |
 
 #### Name types
 
@@ -284,6 +296,10 @@ The configuration file contains the next scopes (fields):
             "casing": "kebab",
             "postfix": "",
             "postfixDevider": "."
+        },
+        "export": {
+            "default": false,
+            "inline": true
         }
     },
     "component": {
@@ -293,7 +309,6 @@ The configuration file contains the next scopes (fields):
             "test": true,
             "proptypes": true,
             "index": true,
-            "defaultExport": true,
             "inFolder": true,
             "open": true,
             "fileNaming": {
