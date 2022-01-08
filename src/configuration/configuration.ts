@@ -72,10 +72,8 @@ export interface ContextConfig extends BaseConfig {
 	hook: boolean;
 	open: boolean;
 	customProvider: boolean;
-	export: {
+	export: ExportConfig & {
 		destructure: boolean;
-		default: boolean;
-		inline: boolean;
 	};
 }
 
