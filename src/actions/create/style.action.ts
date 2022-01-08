@@ -15,7 +15,7 @@ import { getSourcePath, loadScopeConfiguration, StyleConfig } from '../../config
 
 // Templates
 import StyleTemplate from '../../templates/style/style.template';
-import JSStyleTypeTemplate from '../../templates/style/styled-components.style.type.template';
+import StyledComponentsStyleTypeTemplate from '../../templates/style/styled-components.style.type.template';
 import CSSStyleTypeTemplate from '../../templates/style/css.style.type.template';
 
 // Types
@@ -60,7 +60,9 @@ class CreateStyleAction extends BaseAction {
 		});
 
 		const StyleTypeTemplate =
-			stylingType === 'js' ? JSStyleTypeTemplate : CSSStyleTypeTemplate;
+			stylingType === 'js'
+				? StyledComponentsStyleTypeTemplate
+				: CSSStyleTypeTemplate;
 
 		const template = new StyleTemplate(
 			inputs!.name,

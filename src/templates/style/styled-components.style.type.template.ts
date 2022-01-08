@@ -1,10 +1,10 @@
-import j, { JSXElement } from 'jscodeshift';
+import j, { ExportSpecifier, JSXElement } from 'jscodeshift';
 import BaseStyleTypeTemplate from './base.style.type.template';
 import { removeExtension } from '../../utils/path';
 import { addImport, constructTemplate } from '../../utils/template';
 import { parser } from '../../parser';
 
-class JSStyleTypeTemplate extends BaseStyleTypeTemplate {
+class StyledComponentsStyleTypeTemplate extends BaseStyleTypeTemplate {
 	build() {
 		const body = [];
 
@@ -15,25 +15,37 @@ class JSStyleTypeTemplate extends BaseStyleTypeTemplate {
 			)
 		);
 
-		body.push(
-			j.exportNamedDeclaration(
-				j.variableDeclaration('const', [
-					j.variableDeclarator(
-						j.identifier(`Styled${this.name}`),
-						j.taggedTemplateExpression(
-							j.memberExpression(
-								j.identifier('styled'),
-								j.identifier('div')
-							),
-							j.templateLiteral(
-								[j.templateElement({ raw: '', cooked: '' }, true)],
-								[]
-							)
-						)
-					),
-				])
-			)
+		const variableIdentifier = j.identifier(`Styled${this.name}`);
+		const styledExpression = j.taggedTemplateExpression(
+			j.memberExpression(j.identifier('styled'), j.identifier('div')),
+			j.templateLiteral([j.templateElement({ raw: '', cooked: '' }, true)], [])
 		);
+
+		const variableDeclaration = j.variableDeclaration('const', [
+			j.variableDeclarator(variableIdentifier, styledExpression),
+		]);
+
+		if (this.config.export.default) {
+			if (this.config.export.inline) {
+				body.push(j.exportDefaultDeclaration(styledExpression));
+			} else {
+				body.push(variableDeclaration);
+				body.push(j.exportDefaultDeclaration(variableIdentifier));
+			}
+		} else {
+			if (this.config.export.inline) {
+				body.push(j.exportNamedDeclaration(variableDeclaration));
+			} else {
+				const exportSpecifier: ExportSpecifier = {
+					type: 'ExportSpecifier',
+					exported: variableIdentifier,
+					local: variableIdentifier,
+				};
+
+				body.push(variableDeclaration);
+				body.push(j.exportNamedDeclaration(null, [exportSpecifier]));
+			}
+		}
 
 		return constructTemplate(body);
 	}
@@ -42,10 +54,14 @@ class JSStyleTypeTemplate extends BaseStyleTypeTemplate {
 		const root = j(template, { parser });
 		const elementName = `Styled${name}`;
 
+		const importSpecifier = this.config.export.default
+			? j.importDefaultSpecifier
+			: j.importSpecifier;
+
 		addImport(
 			root,
 			j.importDeclaration(
-				[j.importSpecifier(j.identifier(elementName))],
+				[importSpecifier(j.identifier(elementName))],
 				j.literal(removeExtension(importPath))
 			)
 		);
@@ -62,4 +78,4 @@ class JSStyleTypeTemplate extends BaseStyleTypeTemplate {
 	}
 }
 
-export default JSStyleTypeTemplate;
+export default StyledComponentsStyleTypeTemplate;

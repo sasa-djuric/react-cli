@@ -1,5 +1,5 @@
 // Libs
-import j from 'jscodeshift';
+import j, { ExportSpecifier } from 'jscodeshift';
 
 // Types
 import { HookConfig } from '../../configuration';
@@ -16,18 +16,31 @@ class HookTemplate extends BaseTemplate {
 	build() {
 		const body = [];
 
-		const hook = j.variableDeclaration('const', [
-			j.variableDeclarator(
-				j.identifier(this.name),
-				j.arrowFunctionExpression([], j.blockStatement([]))
-			),
+		const hookFunction = j.arrowFunctionExpression([], j.blockStatement([]));
+		const hookVariableDeclaration = j.variableDeclaration('const', [
+			j.variableDeclarator(j.identifier(this.name), hookFunction),
 		]);
 
-		if (this.config.defaultExport) {
-			body.push(hook);
-			body.push(j.exportDeclaration(true, j.identifier(this.name)));
+		if (this.config.export.default) {
+			if (this.config.export.inline) {
+				body.push(j.exportDefaultDeclaration(hookFunction));
+			} else {
+				body.push(hookVariableDeclaration);
+				body.push(j.exportDeclaration(true, j.identifier(this.name)));
+			}
 		} else {
-			body.push(j.exportDeclaration(false, hook));
+			if (this.config.export.inline) {
+				body.push(j.exportDeclaration(false, hookVariableDeclaration));
+			} else {
+				const exportSpecifier: ExportSpecifier = {
+					type: 'ExportSpecifier',
+					exported: j.identifier(this.name),
+					local: j.identifier(this.name),
+				};
+
+				body.push(hookVariableDeclaration);
+				body.push(j.exportNamedDeclaration(null, [exportSpecifier]));
+			}
 		}
 
 		return constructTemplate(body);

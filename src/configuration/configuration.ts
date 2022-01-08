@@ -11,6 +11,11 @@ export interface FileNamingConfig {
 	casing: Casing;
 }
 
+export interface ExportConfig {
+	default: boolean;
+	inline: boolean;
+}
+
 export interface BaseConfig {
 	path: string;
 	typescript: boolean;
@@ -25,6 +30,7 @@ export interface ProjectConfig {
 	lint: boolean;
 	format: boolean;
 	verbose: boolean;
+	export: ExportConfig;
 }
 
 export interface ComponentConfig extends BaseConfig {
@@ -37,7 +43,7 @@ export interface ComponentConfig extends BaseConfig {
 	index: boolean;
 	open: boolean;
 	testId: boolean;
-	defaultExport: boolean;
+	export: ExportConfig;
 	override?: {
 		style?: StyleConfig;
 		storybook?: StorybookConfig;
@@ -48,6 +54,7 @@ export interface ComponentConfig extends BaseConfig {
 export interface StyleConfig extends BaseConfig {
 	type: StyleType;
 	modules: boolean;
+	export: ExportConfig;
 }
 
 export interface StorybookConfig extends BaseConfig {}
@@ -58,7 +65,7 @@ export interface TestConfig extends BaseConfig {}
 
 export interface HookConfig extends BaseConfig {
 	open: boolean;
-	defaultExport: boolean;
+	export: ExportConfig;
 }
 
 export interface Config {
