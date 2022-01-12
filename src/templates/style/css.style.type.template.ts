@@ -34,9 +34,14 @@ class CSSStyleTypeTemplate extends BaseStyleTypeTemplate {
 		jsxElement.openingElement.attributes?.unshift(
 			j.jsxAttribute(
 				j.jsxIdentifier('className'),
-				j.jsxExpressionContainer(
-					j.memberExpression(j.identifier('styles'), j.identifier(className))
-				)
+				this.config.modules
+					? j.jsxExpressionContainer(
+							j.memberExpression(
+								j.identifier('styles'),
+								j.identifier(className)
+							)
+					  )
+					: j.stringLiteral(className)
 			)
 		);
 
