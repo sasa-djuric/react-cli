@@ -11,7 +11,7 @@ interface FilePathConstructor {
 	name?: string;
 	fileName?: string;
 	sourcePath: string;
-	pathTypes?: Dictionary<string>;
+	pathPlaceholders?: Dictionary<string>;
 	namePlaceholders?: Dictionary<string>;
 	fileExtension: string;
 	relativeToFilePath?: string;
@@ -39,11 +39,27 @@ class FilePath {
 		this.fullRelative = this.getFullRelative(this.dir, this.base);
 	}
 
-	private getBaseDir() {
-		const pathByType = this.data.pathTypes?.[this.data.config.path];
+	private getPathWithReplacedPlaceholders() {
+		if (this.data.pathPlaceholders) {
+			const regex = new RegExp(
+				Object.keys(this.data.pathPlaceholders).join('|'),
+				'g'
+			);
 
-		if (pathByType) {
-			return pathByType;
+			if (regex.test(this.data.config.path)) {
+				return this.data.config.path.replace(
+					regex,
+					(placeholder) => this.data.pathPlaceholders![placeholder]
+				);
+			}
+		}
+	}
+
+	private getBaseDir() {
+		const pathWithReplacedPlaceholders = this.getPathWithReplacedPlaceholders();
+
+		if (pathWithReplacedPlaceholders) {
+			return pathWithReplacedPlaceholders;
 		}
 
 		const subFolders = this.data.name ? this.parseSubFolders(this.data.name) : [];
@@ -54,10 +70,10 @@ class FilePath {
 	}
 
 	private getDir(namePreferred: string, baseDir: string) {
-		const pathByType = this.data.pathTypes?.[this.data.config.path];
+		const pathWithReplacedPlaceholders = this.getPathWithReplacedPlaceholders();
 
-		if (pathByType) {
-			return pathByType;
+		if (pathWithReplacedPlaceholders) {
+			return pathWithReplacedPlaceholders;
 		}
 
 		const directory = this.data.config.inFolder ? namePreferred : '';
@@ -119,7 +135,9 @@ class FilePath {
 
 	private parseName(name: string) {
 		if (!name) return '';
-		return name.lastIndexOf('/') >= 0 ? name.substr(name.lastIndexOf('/') + 1) : name;
+		return name.lastIndexOf('/') >= 0
+			? name.substring(name.lastIndexOf('/') + 1)
+			: name;
 	}
 
 	private parseSubFolders(path: string) {

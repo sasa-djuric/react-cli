@@ -5,7 +5,7 @@ import path from 'path';
 import { cssStyleTypes } from '../../constants';
 
 // Helpers
-import { handlePathCheck } from '../../utils/path';
+import { fixRelativePath, handlePathCheck } from '../../utils/path';
 import { merge } from '../../utils/object';
 import { formatTemplate } from '../../utils/template';
 import FilePath from '../../file-path';
@@ -58,7 +58,7 @@ class CreateStyleAction extends BaseAction {
 			name: inputs!.name,
 			config: config,
 			relativeToFilePath: inputs!.filePath,
-			pathTypes: {
+			pathPlaceholders: {
 				'{componentPath}': inputs!.filePath,
 			},
 			sourcePath: getSourcePath(),
@@ -83,11 +83,10 @@ class CreateStyleAction extends BaseAction {
 
 		await handlePathCheck(filePath.dir);
 
-		const componentTemplate = template.include(
-			inputs.template,
-			filePath.fullRelative!
+		const importPath = fixRelativePath(
+			path.join(path.relative(inputs.filePath, filePath.baseDir), filePath.base)
 		);
-
+		const componentTemplate = template.include(inputs.template, importPath);
 		const componentFilePath = path.join(inputs.filePath, inputs.fileName);
 
 		await this.create(filePath.full, formatTemplate(template.build()));

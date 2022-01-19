@@ -46,7 +46,9 @@ class CreateStoryAction extends BaseAction {
 			relativeToFilePath: path.parse(inputs!.filePath).dir,
 			name: inputs!.name || inputs!.componentName,
 			namePlaceholders: Object.assign({}, inputs!.namePlaceholders),
-			pathTypes: { '{componentPath}': path.parse(inputs!.filePath).dir },
+			pathPlaceholders: {
+				'{componentPath}': path.parse(inputs!.filePath).dir,
+			},
 			sourcePath: getSourcePath(),
 			fileExtension: config.typescript ? 'tsx' : 'jsx',
 		});

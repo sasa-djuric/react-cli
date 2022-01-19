@@ -43,7 +43,7 @@ class CreateTestAction extends BaseAction {
 			namePlaceholders: Object.assign({}, inputs!.namePlaceholders, {
 				'{type}': 'test',
 			}),
-			pathTypes: {
+			pathPlaceholders: {
 				'{componentPath}': path.parse(inputs!.filePath).dir,
 			},
 			sourcePath: getSourcePath(),
