@@ -24,8 +24,7 @@ export interface TestInputs {
 	componentName: string;
 	componentDefaultImport: boolean;
 	filePath: string;
-	nameTypes?: Dictionary<string>;
-	postfixTypes?: Dictionary<string>;
+	namePlaceholders?: Dictionary<string>;
 	configOverride?: TestConfig;
 }
 
@@ -41,9 +40,12 @@ class CreateTestAction extends BaseAction {
 			name: inputs!.name || inputs!.componentName,
 			config: config,
 			relativeToFilePath: path.parse(inputs!.filePath).dir,
-			nameTypes: Object.assign({}, inputs!.nameTypes, { '{type}': 'test' }),
-			pathTypes: { '{componentPath}': path.parse(inputs!.filePath).dir },
-			postfixTypes: inputs!.postfixTypes,
+			namePlaceholders: Object.assign({}, inputs!.namePlaceholders, {
+				'{type}': 'test',
+			}),
+			pathTypes: {
+				'{componentPath}': path.parse(inputs!.filePath).dir,
+			},
 			sourcePath: getSourcePath(),
 			fileExtension: config.typescript ? 'tsx' : 'jsx',
 		});

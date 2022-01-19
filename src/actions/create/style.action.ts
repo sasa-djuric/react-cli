@@ -28,8 +28,7 @@ export interface StyleInputs {
 	name: string;
 	filePath: string;
 	fileName: string;
-	nameTypes?: Dictionary<string>;
-	postfixTypes?: Dictionary<string>;
+	namePlaceholders?: Dictionary<string>;
 	template: string;
 	configOverride?: StyleConfig;
 }
@@ -47,15 +46,26 @@ class CreateStyleAction extends BaseAction {
 		const jsTypeExtension = config.typescript ? 'ts' : 'js';
 		const fileExtension = stylingType === 'js' ? jsTypeExtension : config.type;
 
+		if (
+			stylingType === 'css' &&
+			config.modules &&
+			!config.fileNaming.name.endsWith('.module')
+		) {
+			config.fileNaming.name += '.module';
+		}
+
 		const filePath = new FilePath({
 			name: inputs!.name,
 			config: config,
 			relativeToFilePath: inputs!.filePath,
-			pathTypes: { '{componentPath}': inputs!.filePath },
+			pathTypes: {
+				'{componentPath}': inputs!.filePath,
+			},
 			sourcePath: getSourcePath(),
-			nameTypes: inputs!.nameTypes,
-			postfixTypes: { ...(inputs!.postfixTypes || {}), '{type}': 'style' },
-			postfix: [config.modules && stylingType !== 'js' ? 'module' : ''],
+			namePlaceholders: {
+				...(inputs!.namePlaceholders || {}),
+				'{type}': 'style',
+			},
 			fileExtension: fileExtension,
 		});
 

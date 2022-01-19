@@ -16,6 +16,7 @@ import Dictionary from '../types/dictionary';
 import { ComponentConfig, Config } from './configuration';
 
 import { updateConfigurationFile } from '.';
+import { migration } from './migration';
 
 const fileName = `${settings.CONFIG_NAME}.json`;
 const globalPath = path.resolve(settings.ROOT_PATH, fileName);
@@ -70,53 +71,6 @@ function handleMerge(config: Config): Config {
 		test: merge(config.test || defaultConfiguration.test, mergeConfig),
 		hook: merge(config.hook || defaultConfiguration.hook, mergeConfig),
 		context: merge(config.context || defaultConfiguration.context, mergeConfig),
-	};
-}
-
-function migration(config: Config) {
-	let isModified = false;
-
-	const component = Object.entries(config.component).reduce<
-		Record<string, ComponentConfig>
-	>((acc, [componentType, typeConfig]) => {
-		acc[componentType] = typeConfig;
-
-		if (typeof (typeConfig as any).defaultExport === 'boolean') {
-			acc[componentType].export = {
-				...(acc[componentType].export || {}),
-				default: (typeConfig as any).defaultExport,
-			};
-
-			delete (acc[componentType] as any).defaultExport;
-
-			isModified = true;
-		}
-
-		return acc;
-	}, {});
-
-	const hook = {
-		...config.hook,
-	};
-
-	if (typeof (hook as any).defaultExport === 'boolean') {
-		hook.export = {
-			...(hook.export || {}),
-			default: (hook as any).defaultExport,
-		};
-
-		delete (hook as any).defaultExport;
-
-		isModified = true;
-	}
-
-	return {
-		isModified,
-		config: {
-			...config,
-			component,
-			hook,
-		},
 	};
 }
 

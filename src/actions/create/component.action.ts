@@ -59,7 +59,7 @@ class CreateComponentAction extends BaseAction {
 			fileName: options?.fileName,
 			config: config,
 			sourcePath: getSourcePath(),
-			postfixTypes: {
+			namePlaceholders: {
 				'{componentType}': compnentTypePostfix,
 				'{type}': inputs.type,
 			},
@@ -92,8 +92,10 @@ class CreateComponentAction extends BaseAction {
 				name: componentName,
 				filePath: path.dir,
 				fileName: path.name + '.' + path.ext,
-				nameTypes: { '{name}': path.namePreferred },
-				postfixTypes: { '{componentType}': inputs.type },
+				namePlaceholders: {
+					'{name}': path.namePreferred,
+					'{componentType}': inputs.type,
+				},
 				configOverride: config.override?.style,
 				template,
 			};
@@ -123,7 +125,9 @@ class CreateComponentAction extends BaseAction {
 				componentName: componentName,
 				componentDefaultImport: config.export.default,
 				componentType: inputs.type,
-				nameTypes: { '{name}': path.namePreferred },
+				namePlaceholders: {
+					'{name}': path.namePreferred,
+				},
 				configOverride: config.override?.storybook,
 			};
 
@@ -135,7 +139,9 @@ class CreateComponentAction extends BaseAction {
 				filePath: path.full,
 				componentName: componentName,
 				componentDefaultImport: config.export.default,
-				nameTypes: { '{name}': path.namePreferred },
+				namePlaceholders: {
+					'{name}': path.namePreferred,
+				},
 				configOverride: config.override?.test,
 			};
 

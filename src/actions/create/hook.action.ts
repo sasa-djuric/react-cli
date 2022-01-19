@@ -42,7 +42,9 @@ class CreateHookAction extends BaseAction {
 			name,
 			fileExtension: config.typescript ? 'ts' : 'js',
 			sourcePath: getSourcePath(),
-			postfixTypes: { type: 'hook' },
+			namePlaceholders: {
+				'{type}': 'hook',
+			},
 			config: config,
 		});
 

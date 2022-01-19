@@ -44,7 +44,9 @@ class CreateContextAction extends BaseAction {
 			fileExtension:
 				(config.typescript ? 'ts' : 'js') + (config.customProvider ? 'x' : ''),
 			sourcePath: getSourcePath(),
-			postfixTypes: { type: 'context' },
+			namePlaceholders: {
+				'{type}': 'context',
+			},
 			config: config,
 		});
 

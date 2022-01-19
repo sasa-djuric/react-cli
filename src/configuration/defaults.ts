@@ -10,8 +10,6 @@ export const defaultConfiguration: DeepPartial<Config> = Object.freeze({
 		verbose: true,
 		fileNaming: {
 			name: '{name}',
-			postfix: '',
-			postfixDevider: '.',
 			casing: 'kebab',
 		},
 		export: {
@@ -34,8 +32,6 @@ export const defaultConfiguration: DeepPartial<Config> = Object.freeze({
 			path: '/components',
 			fileNaming: {
 				name: '{name}',
-				postfix: '',
-				postfixDevider: '.',
 				casing: 'kebab',
 			},
 		},
@@ -52,13 +48,13 @@ export const defaultConfiguration: DeepPartial<Config> = Object.freeze({
 	storybook: {
 		path: '{componentPath}',
 		fileNaming: {
-			postfix: 'stories',
+			name: '{name}.stories',
 		},
 	},
 	test: {
 		path: '{componentPath}',
 		fileNaming: {
-			postfix: 'test',
+			name: '{name}.test',
 		},
 	},
 	hook: {

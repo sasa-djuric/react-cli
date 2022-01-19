@@ -29,8 +29,7 @@ export interface StorybookInputs {
 	componentDefaultImport: boolean;
 	componentType: string;
 	filePath: string;
-	nameTypes?: Dictionary<string>;
-	postfixTypes?: Dictionary<string>;
+	namePlaceholders?: Dictionary<string>;
 	configOverride?: StorybookConfig;
 }
 
@@ -46,9 +45,8 @@ class CreateStoryAction extends BaseAction {
 			config: config,
 			relativeToFilePath: path.parse(inputs!.filePath).dir,
 			name: inputs!.name || inputs!.componentName,
-			nameTypes: Object.assign({}, inputs!.nameTypes),
+			namePlaceholders: Object.assign({}, inputs!.namePlaceholders),
 			pathTypes: { '{componentPath}': path.parse(inputs!.filePath).dir },
-			postfixTypes: inputs!.postfixTypes,
 			sourcePath: getSourcePath(),
 			fileExtension: config.typescript ? 'tsx' : 'jsx',
 		});

@@ -12,9 +12,7 @@ interface FilePathConstructor {
 	fileName?: string;
 	sourcePath: string;
 	pathTypes?: Dictionary<string>;
-	nameTypes?: Dictionary<string>;
-	postfixTypes?: Dictionary<string>;
-	postfix?: Array<string>;
+	namePlaceholders?: Dictionary<string>;
 	fileExtension: string;
 	relativeToFilePath?: string;
 	config: BaseConfig;
@@ -81,46 +79,27 @@ class FilePath {
 	}
 
 	private getName(namePreferred: string) {
-		const nameTypes: Dictionary<string> = {
-			'{name}': namePreferred,
-			...(this.data.nameTypes || {}),
-		};
+		const namePlaceholders: Dictionary<string> = Object.assign(
+			{},
+			{ '{name}': namePreferred },
+			this.data.namePlaceholders
+		);
 
 		const preferredCasing = this.data.config.fileNaming.casing;
 
-		const rawName =
-			nameTypes[this.data.config.fileNaming.name] ||
-			this.data.config.fileNaming.name ||
-			this.data.name;
-
-		const namePostfix = this.getPostfix(
-			[this.data.config.fileNaming.postfix, ...(this.data.postfix || [])],
-			this.data.config.fileNaming.postfixDevider,
-			this.data.postfixTypes
-		);
+		const rawName = this.data.config.fileNaming.name
+			? this.data.config.fileNaming.name.replace(
+					new RegExp(Object.keys(namePlaceholders).join('|'), 'g'),
+					(placeholder) => namePlaceholders[placeholder]
+			  )
+			: this.data.name;
 
 		const name =
-			this.data.fileName || casing[preferredCasing](rawName!) + namePostfix;
+			this.data.fileName ||
+			// Allow "."
+			rawName!.split('.').map(casing[preferredCasing]).join('.');
 
 		return name;
-	}
-
-	private getPostfix(
-		name: string | Array<string>,
-		devider: string = '',
-		types: Dictionary<string> = {}
-	) {
-		const handleConstruct = (name: string) =>
-			devider + (types?.[name] ? types[name] : name);
-
-		if (Array.isArray(name)) {
-			return name.reduce(
-				(acc, name) => acc + (name ? handleConstruct(name) : ''),
-				''
-			);
-		}
-
-		return name?.length ? handleConstruct(name) : '';
 	}
 
 	private getFull(dir: string, base: string) {

@@ -4,10 +4,15 @@ export type StyleType = CSSStyleType | JSStyleType;
 export type Casing = 'kebab' | 'snake' | 'camel' | 'pascal';
 export type Scope = 'global' | 'project';
 
-export interface FileNamingConfig {
+export interface FileNamingConfigDeprecated {
 	name: string;
 	postfix: any;
 	postfixDevider: string;
+	casing: Casing;
+}
+
+export interface FileNamingConfig {
+	name: string;
 	casing: Casing;
 }
 
