@@ -33,7 +33,7 @@ After the init command is executed, you will be asked questions about your proje
 ### 3. Use it
 
 React CLI can be used with several aliases like: cr-react-cli, react-cli, react, rct.
-Run component, context or hook commands to generate boilerplate files.
+Run [component](https://reactcli.org/docs/commands/component), [context](https://reactcli.org/docs/commands/context) or [hook](https://reactcli.org/docs/commands/hook) commands to generate boilerplate files.
 
 ```bash
 npx react component menu
