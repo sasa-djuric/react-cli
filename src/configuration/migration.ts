@@ -29,35 +29,38 @@ function fileNamingMigration(fileNaming: FileNamingConfigDeprecated): FileNaming
 export function migration(config: Config) {
 	let isModified = false;
 
-	if (isDepercatedFileNaming(config.storybook.fileNaming)) {
+	if (
+		config.storybook?.fileNaming &&
+		isDepercatedFileNaming(config.storybook.fileNaming)
+	) {
 		isModified = true;
 		config.storybook.fileNaming = fileNamingMigration(
 			Object.assign({}, config.project.fileNaming, config.storybook.fileNaming)
 		);
 	}
 
-	if (isDepercatedFileNaming(config.style.fileNaming)) {
+	if (config.style?.fileNaming && isDepercatedFileNaming(config.style.fileNaming)) {
 		isModified = true;
 		config.style.fileNaming = fileNamingMigration(
 			Object.assign({}, config.project.fileNaming, config.style.fileNaming)
 		);
 	}
 
-	if (isDepercatedFileNaming(config.test.fileNaming)) {
+	if (config.test?.fileNaming && isDepercatedFileNaming(config.test.fileNaming)) {
 		isModified = true;
 		config.test.fileNaming = fileNamingMigration(
 			Object.assign({}, config.project.fileNaming, config.test.fileNaming)
 		);
 	}
 
-	if (isDepercatedFileNaming(config.context.fileNaming)) {
+	if (config.context?.fileNaming && isDepercatedFileNaming(config.context.fileNaming)) {
 		isModified = true;
 		config.context.fileNaming = fileNamingMigration(
 			Object.assign({}, config.project.fileNaming, config.context.fileNaming)
 		);
 	}
 
-	if (isDepercatedFileNaming(config.hook.fileNaming)) {
+	if (config.hook?.fileNaming && isDepercatedFileNaming(config.hook.fileNaming)) {
 		isModified = true;
 		config.hook.fileNaming = fileNamingMigration(
 			Object.assign({}, config.project.fileNaming, config.hook.fileNaming)
@@ -101,7 +104,7 @@ export function migration(config: Config) {
 		isModified = true;
 	}
 
-	if (isDepercatedFileNaming(config.project.fileNaming)) {
+	if (config.project?.fileNaming && isDepercatedFileNaming(config.project.fileNaming)) {
 		isModified = true;
 		config.project.fileNaming = fileNamingMigration(config.project.fileNaming);
 	}
