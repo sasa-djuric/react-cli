@@ -17,7 +17,7 @@ export function getProjectRoot() {
 	for (let i = 0; i < directories.length; i++) {
 		const currentPath = directories.join(path.sep);
 
-		if (fs.existsSync(path.resolve(currentPath, 'package.json'))) {
+		if (fs.existsSync(path.join(currentPath, 'package.json'))) {
 			projectRoot = currentPath;
 			return currentPath;
 		}

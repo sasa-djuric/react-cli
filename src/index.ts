@@ -26,7 +26,12 @@ import CreateComponentCommand from './commands/create/component.command';
 import CreateHookCommand from './commands/create/hook.command';
 import CreateContextCommand from './commands/create/context.command';
 
-const packageJson = require(path.resolve(settings.ROOT_PATH, 'package.json'));
+const packageJsonBasePath =
+	process.env.NODE_ENV === 'development'
+		? path.join(settings.ROOT_PATH, '../')
+		: settings.ROOT_PATH;
+
+const packageJson = require(path.join(packageJsonBasePath, 'package.json'));
 
 async function checkConfiguration() {
 	const ignoreForArgs: Record<string, boolean> = {
