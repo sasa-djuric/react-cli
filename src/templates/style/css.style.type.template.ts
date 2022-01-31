@@ -30,6 +30,7 @@ class CSSStyleTypeTemplate extends BaseStyleTypeTemplate {
 		);
 
 		const jsxElement: JSXElement = root.findJSXElements().at(0).get().value;
+		const isValidClassName = !className.includes('-');
 
 		jsxElement.openingElement.attributes?.unshift(
 			j.jsxAttribute(
@@ -38,7 +39,10 @@ class CSSStyleTypeTemplate extends BaseStyleTypeTemplate {
 					? j.jsxExpressionContainer(
 							j.memberExpression(
 								j.identifier('styles'),
-								j.identifier(className)
+								isValidClassName
+									? j.identifier(className)
+									: j.stringLiteral(className),
+								!isValidClassName
 							)
 					  )
 					: j.stringLiteral(className)
